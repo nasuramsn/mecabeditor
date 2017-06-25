@@ -1,0 +1,424 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace MecabEditor
+{
+    public partial class frmEditSeed : Form
+    {
+        //[DllImport("libmecab.dll", CallingConvention = CallingConvention.Cdecl)]
+        //extern static IntPtr mecab_new2(string arg);
+        //[DllImport("libmecab.dll", CallingConvention = CallingConvention.Cdecl)]
+        //extern static IntPtr mecab_sparse_tostr(IntPtr m, string str);
+        //[DllImport("libmecab.dll", CallingConvention = CallingConvention.Cdecl)]
+        //extern static void mecab_destroy(IntPtr m);
+
+        //メンバ
+        private SeedInfo mySeedInfo = new SeedInfo();
+        private Dictionary<String, Boolean> dicIsEdited = new Dictionary<String, Boolean>();
+        private int intEditMode = -1;               //編集モード 0:追加 1:編集
+        private int intReturnValue = -1;
+
+        //品詞情報など
+        private List<String> lstHinshi = new List<String>();
+        private List<String> lstHinshiSub1 = new List<String>();
+        private List<String> lstHinshiSub2 = new List<String>();
+        private List<String> lstHinshiSub3 = new List<String>();
+        private List<String> lstKatsuyo1 = new List<String>();
+        private List<String> lstKatsuyo2 = new List<String>();
+
+        private List<MSeed> lstAnalyzeSeed = new List<MSeed>();
+
+
+        public frmEditSeed()
+        {
+            InitializeComponent();
+        }
+
+        //Form表示後
+        private void frmEditCsv_Shown(object sender, EventArgs e)
+        {
+            //品詞の設定
+            cmbHinshi.Items.Clear();
+            cmbHinshi.Items.Add(String.Empty);
+            lstHinshi.ForEach(delegate(String strHinshiWork)
+            {
+                cmbHinshi.Items.Add(strHinshiWork);
+            });
+            cmbHinshi.DropDownStyle = ComboBoxStyle.DropDown;
+            cmbHinshi.SelectedIndex = 0;
+
+            //品詞詳細1の設定
+            cmbHinshiDetail1.Items.Clear();
+            cmbHinshiDetail1.Items.Add(String.Empty);
+            lstHinshiSub1.ForEach(delegate(String strHinshiSub1Work)
+            {
+                cmbHinshiDetail1.Items.Add(strHinshiSub1Work);
+            });
+            cmbHinshiDetail1.DropDownStyle = ComboBoxStyle.DropDown;
+            cmbHinshiDetail1.SelectedIndex = 0;
+
+            //品詞詳細2の設定
+            cmbHinshiDetail2.Items.Clear();
+            cmbHinshiDetail2.Items.Add(String.Empty);
+            lstHinshiSub2.ForEach(delegate(String strHinshiSub2Work)
+            {
+                cmbHinshiDetail2.Items.Add(strHinshiSub2Work);
+            });
+            cmbHinshiDetail2.DropDownStyle = ComboBoxStyle.DropDown;
+            cmbHinshiDetail2.SelectedIndex = 0;
+
+            //品詞詳細3の設定
+            cmbHinshiDetail3.Items.Clear();
+            cmbHinshiDetail3.Items.Add(String.Empty);
+            lstHinshiSub3.ForEach(delegate(String strHinshiSub3Work)
+            {
+                cmbHinshiDetail3.Items.Add(strHinshiSub3Work);
+            });
+            cmbHinshiDetail3.DropDownStyle = ComboBoxStyle.DropDown;
+            cmbHinshiDetail3.SelectedIndex = 0;
+
+            //活用形の設定
+            cmbKatsuyoukei.Items.Clear();
+            cmbKatsuyoukei.Items.Add(String.Empty);
+            lstKatsuyo1.ForEach(delegate(String strKatsuyo1Work)
+            {
+                cmbKatsuyoukei.Items.Add(strKatsuyo1Work);
+            });
+            cmbKatsuyoukei.DropDownStyle = ComboBoxStyle.DropDown;
+            cmbKatsuyoukei.SelectedIndex = 0;
+
+            //活用型の設定
+            cmbKatsuyoType.Items.Clear();
+            cmbKatsuyoType.Items.Add(String.Empty);
+            lstKatsuyo2.ForEach(delegate(String strKatsuyo2Work)
+            {
+                cmbKatsuyoType.Items.Add(strKatsuyo2Work);
+            });
+            cmbKatsuyoType.DropDownStyle = ComboBoxStyle.DropDown;
+            cmbKatsuyoType.SelectedIndex = 0;
+
+            lstvwAnalyze.Clear();
+            lstvwAnalyze.Columns.Add(XmlDatas.ListNames["HYOSO_TYPE"]);
+            lstvwAnalyze.Columns.Add(XmlDatas.ListNames["HINSHI"]);
+            lstvwAnalyze.Columns.Add(XmlDatas.ListNames["HINSHI_DETAIL_1"]);
+            lstvwAnalyze.Columns.Add(XmlDatas.ListNames["HINSHI_DETAIL_2"]);
+            lstvwAnalyze.Columns.Add(XmlDatas.ListNames["HINSHI_DETAIL_3"]);
+            lstvwAnalyze.Columns.Add(XmlDatas.ListNames["KATSUYO_KEI"]);
+            lstvwAnalyze.Columns.Add(XmlDatas.ListNames["KATSUYO_TYPE"]);
+            lstvwAnalyze.Columns.Add(XmlDatas.ListNames["BASE_TYPE"]);
+            lstvwAnalyze.Columns.Add(XmlDatas.ListNames["YOMI"]);
+            lstvwAnalyze.Columns.Add(XmlDatas.ListNames["HATSUON"]);
+        }
+
+        //保存ボタンクリック時
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            if (inputCheck())
+            {
+                mySeedInfo.dicMembers["HYOSO_TYPE"] = txtHyosokei.Text;
+                mySeedInfo.dicMembers["HINSHI"] = cmbHinshi.Text;
+                mySeedInfo.dicMembers["HINSHI_DETAIL_1"] = cmbHinshiDetail1.Text;
+                mySeedInfo.dicMembers["HINSHI_DETAIL_2"] = cmbHinshiDetail2.Text;
+                mySeedInfo.dicMembers["HINSHI_DETAIL_3"] = cmbHinshiDetail3.Text;
+                mySeedInfo.dicMembers["KATSUYO_KEI"] = cmbKatsuyoukei.Text;
+                mySeedInfo.dicMembers["KATSUYO_TYPE"] = cmbKatsuyoType.Text;
+                mySeedInfo.dicMembers["BASE_TYPE"] = txtBaseType.Text;
+                mySeedInfo.dicMembers["YOMI"] = txtYomi.Text;
+                mySeedInfo.dicMembers["HATSUON"] = txtHatsuon.Text;
+
+                intReturnValue = 1;
+
+                Close();
+            }
+        }
+
+        //入力チェック
+        private Boolean inputCheck()
+        {
+            Boolean bResult = true;
+            List<String> lstMessages = new List<String>();
+
+            //表層系
+            txtHyosokei.BackColor = XmlDatas.ListColors["NORMAL_TEXT"];
+
+            if (txtHyosokei.Text.Length == 0)
+            {
+                lstMessages.Add(String.Format(XmlDatas.ListMessages["ERROR_3"].ToString(), XmlDatas.ListNames["HYOSO_TYPE"].ToString()));
+                txtHyosokei.BackColor = XmlDatas.ListColors["ERROR_TEXT"];
+                bResult = false;
+            }
+
+            //品詞
+            cmbHinshi.BackColor = XmlDatas.ListColors["NORMAL_TEXT"];
+
+            if (cmbHinshi.Text.Length == 0)
+            {
+                lstMessages.Add(String.Format(XmlDatas.ListMessages["ERROR_3"].ToString(), XmlDatas.ListNames["HINSHI"].ToString()));
+                cmbHinshi.BackColor = XmlDatas.ListColors["ERROR_TEXT"];
+                bResult = false;
+            }
+
+            //品詞詳細1
+            cmbHinshiDetail1.BackColor = XmlDatas.ListColors["NORMAL_TEXT"];
+
+            if (cmbHinshiDetail1.Text.Length == 0)
+            {
+                lstMessages.Add(String.Format(XmlDatas.ListMessages["ERROR_3"].ToString(), XmlDatas.ListNames["HINSHI_DETAIL_1"].ToString()));
+                cmbHinshiDetail1.BackColor = XmlDatas.ListColors["ERROR_TEXT"];
+                bResult = false;
+            }
+
+            //品詞詳細2
+            cmbHinshiDetail2.BackColor = XmlDatas.ListColors["NORMAL_TEXT"];
+
+            if (cmbHinshiDetail2.Text.Length == 0)
+            {
+                lstMessages.Add(String.Format(XmlDatas.ListMessages["ERROR_3"].ToString(), XmlDatas.ListNames["HINSHI_DETAIL_2"].ToString()));
+                cmbHinshiDetail2.BackColor = XmlDatas.ListColors["ERROR_TEXT"];
+                bResult = false;
+            }
+
+            //品詞詳細3
+            cmbHinshiDetail3.BackColor = XmlDatas.ListColors["NORMAL_TEXT"];
+
+            if (cmbHinshiDetail3.Text.Length == 0)
+            {
+                lstMessages.Add(String.Format(XmlDatas.ListMessages["ERROR_3"].ToString(), XmlDatas.ListNames["HINSHI_DETAIL_3"].ToString()));
+                cmbHinshiDetail3.BackColor = XmlDatas.ListColors["ERROR_TEXT"];
+                bResult = false;
+            }
+
+            //活用形
+            cmbKatsuyoukei.BackColor = XmlDatas.ListColors["NORMAL_TEXT"];
+
+            if (cmbKatsuyoukei.Text.Length == 0)
+            {
+                lstMessages.Add(String.Format(XmlDatas.ListMessages["ERROR_3"].ToString(), XmlDatas.ListNames["KATSUYO_KEI"].ToString()));
+                cmbKatsuyoukei.BackColor = XmlDatas.ListColors["ERROR_TEXT"];
+                bResult = false;
+            }
+
+            //活用型
+            cmbKatsuyoType.BackColor = XmlDatas.ListColors["NORMAL_TEXT"];
+
+            if (cmbKatsuyoukei.Text.Length == 0)
+            {
+                lstMessages.Add(String.Format(XmlDatas.ListMessages["ERROR_3"].ToString(), XmlDatas.ListNames["KATSUYO_TYPE"].ToString()));
+                cmbKatsuyoType.BackColor = XmlDatas.ListColors["ERROR_TEXT"];
+                bResult = false;
+            }
+
+            //基本型
+            txtBaseType.BackColor = XmlDatas.ListColors["NORMAL_TEXT"];
+
+            if (txtBaseType.Text.Length == 0)
+            {
+                lstMessages.Add(String.Format(XmlDatas.ListMessages["ERROR_3"].ToString(), XmlDatas.ListNames["BASE_TYPE"].ToString()));
+                txtBaseType.BackColor = XmlDatas.ListColors["ERROR_TEXT"];
+                bResult = false;
+            }
+
+            //読み
+            txtYomi.BackColor = XmlDatas.ListColors["NORMAL_TEXT"];
+
+            if (txtYomi.Text.Length == 0)
+            {
+                lstMessages.Add(String.Format(XmlDatas.ListMessages["ERROR_3"].ToString(), XmlDatas.ListNames["YOMI"].ToString()));
+                txtYomi.BackColor = XmlDatas.ListColors["ERROR_TEXT"];
+                bResult = false;
+            }
+
+            //発音
+            txtHatsuon.BackColor = XmlDatas.ListColors["NORMAL_TEXT"];
+
+            if (txtHatsuon.Text.Length == 0)
+            {
+                lstMessages.Add(String.Format(XmlDatas.ListMessages["ERROR_3"].ToString(), XmlDatas.ListNames["HATSUON"].ToString()));
+                txtHatsuon.BackColor = XmlDatas.ListColors["ERROR_TEXT"];
+                bResult = false;
+            }
+
+            String strMessage = String.Empty;
+            if (!bResult)
+            {
+                lstMessages.ForEach(delegate(String strMessageWork)
+                {
+                    strMessage = strMessage + strMessageWork + "\n";
+                });
+                MessageBox.Show(strMessage);
+            }
+
+            return bResult;
+        }
+
+        //閉じるボタンクリック時
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        //getter, setter
+
+        //Seed情報
+        public SeedInfo MySeedInfo
+        {
+            get { return mySeedInfo; }
+            set { mySeedInfo = value; }
+        }
+
+        //品詞リスト
+        public List<String> ListHinshi
+        {
+            get { return lstHinshi; }
+            set { lstHinshi = value; }
+        }
+
+        //品詞詳細1リスト
+        public List<String> ListHinshiSub1
+        {
+            get { return lstHinshiSub1; }
+            set { lstHinshiSub1 = value; }
+        }
+
+        //品詞詳細2リスト
+        public List<String> ListHinshiSub2
+        {
+            get { return lstHinshiSub2; }
+            set { lstHinshiSub2 = value; }
+        }
+
+        //品詞詳細3リスト
+        public List<String> ListHinshiSub3
+        {
+            get { return lstHinshiSub3; }
+            set { lstHinshiSub3 = value; }
+        }
+
+        //活用形リスト
+        public List<String> ListKatsuyo1
+        {
+            get { return lstKatsuyo1; }
+            set { lstKatsuyo1 = value; }
+        }
+
+        //活用型リスト
+        public List<String> ListKatsuyo2
+        {
+            get { return lstKatsuyo2; }
+            set { lstKatsuyo2 = value; }
+        }
+
+        //編集モード
+        public int EditMode
+        {
+            get { return intEditMode; }
+            set { intEditMode = value; }
+        }
+
+        //返り値
+        public int ReturnValue
+        {
+            get { return intReturnValue; }
+            set { intReturnValue = value; }
+        }
+
+        //解析開始
+        private void btnAnalyze_Click(object sender, EventArgs e)
+        {
+            String strBatchWork = Application.StartupPath + "\\" + "temp.bat";
+            String strSourceWork = Application.StartupPath + "\\" + "temp.txt";
+            String strDistWork = Application.StartupPath + "\\" + "tempdist.txt";
+            
+            StreamWriter strwtrBatchWork = null;
+            StreamWriter strwtrSourceWork = null;
+            StreamReader strrdrDistWork = null;
+
+            try
+            {
+                strwtrSourceWork = new StreamWriter(@strSourceWork, false, Encoding.GetEncoding("utf-8"));
+                strwtrSourceWork.WriteLine(txtHyosokei.Text);
+                strwtrSourceWork.Close();
+
+                strwtrBatchWork = new StreamWriter(@strBatchWork, false, Encoding.GetEncoding("sjis"));
+                strwtrBatchWork.WriteLine("C:\\MeCab\\bin\\mecab.exe " + strSourceWork + " -o " + strDistWork);
+                strwtrBatchWork.WriteLine("Exit");
+                strwtrBatchWork.Close();
+
+                var startInfo = new ProcessStartInfo();
+                startInfo.FileName = System.Environment.GetEnvironmentVariable("ComSpec");
+                startInfo.CreateNoWindow = false;
+                startInfo.UseShellExecute = false;
+                startInfo.Arguments = "/c " + @strBatchWork;
+
+                Process process = Process.Start(startInfo);
+                process.WaitForExit();
+                process.Close();
+
+                strrdrDistWork = new StreamReader(@strDistWork, Encoding.GetEncoding("utf-8"));
+                int intCountWork = 0;
+                String strLineWork = String.Empty;
+                lstAnalyzeSeed.Clear();
+                while (!strrdrDistWork.EndOfStream)
+                {
+                    strLineWork = strrdrDistWork.ReadLine();
+
+                    if (intCountWork > 0)
+                    {
+                        MSeed seedWork = new MSeed();
+                        if (seedWork.getFromCsvFile(strLineWork))
+                        {
+                            lstAnalyzeSeed.Add(seedWork);
+                        }
+                    }
+
+                    intCountWork++;
+                }
+
+                lstvwAnalyze.Items.Clear();
+                lstAnalyzeSeed.ForEach(delegate(MSeed seedWork)
+                {
+                    String[] strLineList = { seedWork.DictionaryMembers[XmlDatas.ListItemNames["HYOSO_TYPE"]].ToString(), seedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString(), seedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]].ToString(), seedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]].ToString(), seedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]].ToString(), seedWork.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_KEI"]].ToString(), seedWork.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_TYPE"]].ToString(), seedWork.DictionaryMembers[XmlDatas.ListItemNames["BASE_TYPE"]].ToString(), seedWork.DictionaryMembers[XmlDatas.ListItemNames["YOMI"]].ToString(), seedWork.DictionaryMembers[XmlDatas.ListItemNames["HATSUON"]].ToString() };
+                    lstvwAnalyze.Items.Add(new ListViewItem(strLineList));
+                });
+            }
+            catch (IOException ioe)
+            {
+                MessageBox.Show(ioe.Message);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                if (strwtrBatchWork != null)
+                {
+                    strwtrBatchWork.Close();
+                    strwtrBatchWork.Dispose();
+                }
+
+                if (strwtrSourceWork != null)
+                {
+                    strwtrSourceWork.Close();
+                    strwtrSourceWork.Dispose();
+                }
+
+                if (strrdrDistWork != null)
+                {
+                    strrdrDistWork.Close();
+                    strrdrDistWork.Dispose();
+                }
+            }
+        }
+    }
+}

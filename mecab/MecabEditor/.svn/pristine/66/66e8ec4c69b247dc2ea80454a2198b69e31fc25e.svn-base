@@ -1,0 +1,304 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace MecabEditor
+{
+    //色々な用途に使う関数
+    static public class MyUtils
+    {
+        //コンストラクタ
+        static MyUtils()
+        {
+        }
+
+        //sjisからutf8に変更
+        static public String changeSjisToUtf8(String strSource)
+        {
+            String strResult = String.Empty;
+            byte[] byteDatas;
+
+            byteDatas = System.Text.Encoding.GetEncoding(932).GetBytes(strSource);
+            strResult = System.Text.Encoding.UTF8.GetString(byteDatas);
+
+            return strResult;
+        }
+
+        //Csvファイル出力
+        static public Boolean outputCsvFile(String strFileName, List<MSeed> lstMyMSeed)
+        {
+            Boolean bResult = false;
+            StreamWriter strwtr = null;
+
+            try
+            {
+                strwtr = new StreamWriter(@strFileName, false, Encoding.UTF8);
+
+                lstMyMSeed.ForEach(delegate(MSeed mSeedWork)
+                {
+                    String strOutputWork = mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HYOSO_TYPE"]].ToString();
+                    Debug.WriteLine(strOutputWork);
+                    if (!mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString().Equals(String.Empty))
+                    {
+                        strOutputWork = strOutputWork + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["LEFT_CONNECT_STATUS_NO"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["RIGHT_CONNECT_STATUS_NO"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["COST"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_KEI"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_TYPE"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["BASE_TYPE"]].ToString();
+                    }
+
+                    if (!mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["YOMI"]].ToString().Equals(String.Empty))
+                    {
+                        strOutputWork = strOutputWork + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["YOMI"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HATSUON"]].ToString();
+                    }
+
+                    strwtr.WriteLine(strOutputWork);
+                });
+
+                MessageBox.Show(String.Format(XmlDatas.ListMessages["INFORMATION_1"], XmlDatas.ListNames["CSV_FILE_LEARN"]));
+
+
+                bResult = true;
+            }
+            catch (IOException ioe)
+            {
+                MessageBox.Show(ioe.Message);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                if (strwtr != null)
+                {
+                    strwtr.Close();
+                    strwtr.Dispose();
+                }
+            }
+
+            return bResult;
+        }
+
+        //形態要素置換情報ファイル取得
+        public static Boolean getMorphemeReplaceInfoFromFile(String strFilePath, ref List<MorphemeReplaceInfo> lstMorphemeReplaceinfo)
+        {
+            Boolean bResult = false;
+            StreamReader strrdr = null;
+
+            try
+            {
+                if (!File.Exists(@strFilePath))
+                {
+                    MessageBox.Show(String.Format(XmlDatas.ListMessages["ERROR_2"].ToString(), XmlDatas.ListNames["MORPHEME_REPLACE_INFO"].ToString()));
+                    return bResult;
+                }
+
+                strrdr = new StreamReader(@strFilePath, Encoding.GetEncoding("utf-8"));
+                lstMorphemeReplaceinfo.Clear();
+                String strLineWork = String.Empty;
+                MorphemeReplaceInfo morphemeReplaceInfo = new MorphemeReplaceInfo();
+                //List<Boolean> bIsRead = new List<Boolean> { false, false, false, false, false, false };
+                List<Boolean> bIsRead = new List<Boolean> { false, false, false, false, false, false, false, false };
+                
+
+                while (!strrdr.EndOfStream)
+                {
+                    strLineWork = strrdr.ReadLine();
+                    if (strLineWork.Equals(XmlDatas.ListConsts["EOS"]))
+                    {
+                        lstMorphemeReplaceinfo.Add(morphemeReplaceInfo);
+                        morphemeReplaceInfo = new MorphemeReplaceInfo();
+                        //bIsRead = new List<Boolean> { false, false, false, false, false, false };
+                        bIsRead = new List<Boolean> { false, false, false, false, false, false, false, false };
+                    }
+                    else
+                    {
+                        if (!bIsRead[0])
+                        {
+                            morphemeReplaceInfo.MorphemeReplaceInfoName = strLineWork;
+                            bIsRead[0] = true;
+                        }
+                        else if (!bIsRead[1])
+                        {
+                            morphemeReplaceInfo.ListSourceCount = int.Parse(strLineWork);
+                            bIsRead[1] = true;
+                        }
+                        else if (!bIsRead[2])
+                        {
+                            MSeed mSeedWork = new MSeed();
+                            mSeedWork.getFromCsvFile2(strLineWork);
+                            morphemeReplaceInfo.ListSource.Add(mSeedWork);
+                            if (morphemeReplaceInfo.ListSourceCount == morphemeReplaceInfo.ListSource.Count)
+                                bIsRead[2] = true;
+                        }
+                        else if (!bIsRead[3])
+                        {
+                            morphemeReplaceInfo.ListDestinationCount = int.Parse(strLineWork);
+                            bIsRead[3] = true;
+                        }
+                        else if (!bIsRead[4])
+                        {
+                            MSeed mSeedWork = new MSeed();
+                            mSeedWork.getFromCsvFile2(strLineWork);
+                            morphemeReplaceInfo.ListDestination.Add(mSeedWork);
+                            if (morphemeReplaceInfo.ListDestinationCount == morphemeReplaceInfo.ListDestination.Count)
+                                bIsRead[4] = true;
+                        }
+                        else if (!bIsRead[5])
+                        {
+                            if (strLineWork.Equals("True"))
+                                morphemeReplaceInfo.IsLoop = true;
+                            else
+                                morphemeReplaceInfo.IsLoop = false;
+
+                            bIsRead[5] = true;
+                        }
+                        else if (!bIsRead[6])
+                        {
+                            if (strLineWork.Equals("True"))
+                                morphemeReplaceInfo.IsAuto = true;
+                            else
+                                morphemeReplaceInfo.IsAuto = false;
+
+                            bIsRead[6] = true;
+                        }
+                        else if (!bIsRead[7])
+                        {
+                            if (strLineWork.Equals("True"))
+                                morphemeReplaceInfo.IsTake = true;
+                            else
+                                morphemeReplaceInfo.IsTake = false;
+
+                            bIsRead[7] = true;
+                        }
+                    }
+                }
+
+                bResult = true;
+            }
+            catch (IOException ioe)
+            {
+                MessageBox.Show(ioe.Message);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                if (strrdr != null)
+                {
+                    strrdr.Close();
+                    strrdr.Dispose();
+                }
+            }
+
+            return bResult;
+        }
+
+        //形態要素置換情報ファイル出力
+        public static Boolean outputMorphemeReplaceInfoToFile(String strFilePath, List<MorphemeReplaceInfo> lstMorphemeReplaceinfo)
+        {
+            Boolean bResult = false;
+            StreamWriter strwtr = null;
+
+            try
+            {
+                strwtr = new StreamWriter(@strFilePath, false, Encoding.GetEncoding("utf-8"));
+
+                lstMorphemeReplaceinfo.ForEach(delegate(MorphemeReplaceInfo morphemeReplaceInfoEach)
+                {
+                    strwtr.WriteLine(morphemeReplaceInfoEach.MorphemeReplaceInfoName);
+                    strwtr.WriteLine(morphemeReplaceInfoEach.ListSourceCount);
+
+                    morphemeReplaceInfoEach.ListSource.ForEach(delegate(MSeed seedEach)
+                    {
+                        strwtr.WriteLine(seedEach.DictionaryMembers["HYOSO_TYPE"].ToString() + "," + seedEach.DictionaryMembers["HINSHI"].ToString() + "," + seedEach.DictionaryMembers["HINSHI_DETAIL_1"].ToString() + "," + seedEach.DictionaryMembers["HINSHI_DETAIL_2"].ToString() + "," + seedEach.DictionaryMembers["HINSHI_DETAIL_3"].ToString() + "," + seedEach.DictionaryMembers["KATSUYO_KEI"].ToString() + "," + seedEach.DictionaryMembers["KATSUYO_TYPE"].ToString() + "," + seedEach.DictionaryMembers["BASE_TYPE"].ToString() + "," + seedEach.DictionaryMembers["YOMI"].ToString() + "," + seedEach.DictionaryMembers["HATSUON"].ToString());
+                    });
+
+                    strwtr.WriteLine(morphemeReplaceInfoEach.ListDestinationCount);
+
+                    morphemeReplaceInfoEach.ListDestination.ForEach(delegate(MSeed seedEach)
+                    {
+                        strwtr.WriteLine(seedEach.DictionaryMembers["HYOSO_TYPE"].ToString() + "," + seedEach.DictionaryMembers["HINSHI"].ToString() + "," + seedEach.DictionaryMembers["HINSHI_DETAIL_1"].ToString() + "," + seedEach.DictionaryMembers["HINSHI_DETAIL_2"].ToString() + "," + seedEach.DictionaryMembers["HINSHI_DETAIL_3"].ToString() + "," + seedEach.DictionaryMembers["KATSUYO_KEI"].ToString() + "," + seedEach.DictionaryMembers["KATSUYO_TYPE"].ToString() + "," + seedEach.DictionaryMembers["BASE_TYPE"].ToString() + "," + seedEach.DictionaryMembers["YOMI"].ToString() + "," + seedEach.DictionaryMembers["HATSUON"].ToString());
+                    });
+
+                    strwtr.WriteLine(morphemeReplaceInfoEach.IsLoop.ToString());
+                    strwtr.WriteLine(morphemeReplaceInfoEach.IsAuto.ToString());
+                    strwtr.WriteLine(morphemeReplaceInfoEach.IsTake.ToString());
+                    strwtr.WriteLine(XmlDatas.ListConsts["EOS"]);
+                });
+
+                bResult = true;
+            }
+            catch (IOException ioe)
+            {
+                MessageBox.Show(ioe.Message);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                if (strwtr != null)
+                {
+                    strwtr.Close();
+                    strwtr.Dispose();
+                }
+            }
+
+            return bResult;
+        }
+
+        //CSVファイルの表層系に数字のカンマ区切りが入っている場合に対応する
+        public static String[] CsvFileDisposeComma(String[] strSource)
+        {
+            int intMorphemeCountMax1 = int.Parse(XmlDatas.ListConsts["MORPHEME_COUNT_MAX1"].ToString());
+            int intMorphemeCountMax2 = int.Parse(XmlDatas.ListConsts["MORPHEME_COUNT_MAX2"].ToString());
+            int intMorphemeCountMaxResult = 0;
+            List<String> lstDisposeWork = new List<String>();
+            String[] strResult = new String[1] { String.Empty };
+
+            intMorphemeCountMaxResult = intMorphemeCountMax1;
+
+            //末尾とそのひとつ前が*の場合
+            int intLengthWork = strSource.Length;
+            if (strSource[intLengthWork - 2].Equals("*") && strSource[intLengthWork - 1].Equals("*"))
+            {
+                //表層系が*でない場合
+                if (!strSource[0].Equals("*"))
+                {
+                    intMorphemeCountMaxResult = intMorphemeCountMax2;
+                }
+            }
+
+            for (int i = 0; i < intLengthWork; i++)
+            {
+                lstDisposeWork.Add(strSource[i].ToString());
+            }
+            
+            if (lstDisposeWork.Count > intMorphemeCountMaxResult)
+            {
+                while (lstDisposeWork.Count > intMorphemeCountMaxResult)
+                {
+                    lstDisposeWork[0] = lstDisposeWork[0].ToString() + "," + lstDisposeWork[1].ToString();
+                    lstDisposeWork.RemoveAt(1);
+                }
+            }
+
+            Array.Resize(ref strResult, lstDisposeWork.Count);
+
+            int intCountWork = 0;
+            lstDisposeWork.ForEach(delegate(String strWorkLine)
+            {
+                strResult[intCountWork] = strWorkLine;
+                intCountWork++;
+            });
+
+            return strResult;
+        }
+    }
+}

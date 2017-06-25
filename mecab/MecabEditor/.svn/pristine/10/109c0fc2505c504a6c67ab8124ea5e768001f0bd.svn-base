@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<Consts>
+  <SEED_DIRECTORY_PATH>SEED_DIRECTORY_PATH</SEED_DIRECTORY_PATH>
+  <SEED_DIRECTORY_PATH_HEADER>SeedDirectoryPathHeader=</SEED_DIRECTORY_PATH_HEADER>
+  <SETTING_INI_FILE_PATH>./setting.ini</SETTING_INI_FILE_PATH>
+</Consts>

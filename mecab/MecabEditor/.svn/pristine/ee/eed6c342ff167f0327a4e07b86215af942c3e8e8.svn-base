@@ -1,0 +1,107 @@
+﻿namespace MecabEditor
+{
+    partial class frmMain
+    {
+        /// <summary>
+        /// 必要なデザイナー変数です。
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// 使用中のリソースをすべてクリーンアップします。
+        /// </summary>
+        /// <param name="disposing">マネージ リソースが破棄される場合 true、破棄されない場合は false です。</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows フォーム デザイナーで生成されたコード
+
+        /// <summary>
+        /// デザイナー サポートに必要なメソッドです。このメソッドの内容を
+        /// コード エディターで変更しないでください。
+        /// </summary>
+        private void InitializeComponent()
+        {
+            this.btnFile = new System.Windows.Forms.Button();
+            this.btnClose = new System.Windows.Forms.Button();
+            this.dgvMain = new System.Windows.Forms.DataGridView();
+            this.lblReadFile = new System.Windows.Forms.Label();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvMain)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // btnFile
+            // 
+            this.btnFile.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnFile.Location = new System.Drawing.Point(351, 548);
+            this.btnFile.Name = "btnFile";
+            this.btnFile.Size = new System.Drawing.Size(98, 23);
+            this.btnFile.TabIndex = 11;
+            this.btnFile.Text = "ファイル読取り";
+            this.btnFile.UseVisualStyleBackColor = true;
+            this.btnFile.Click += new System.EventHandler(this.btnFile_Click);
+            // 
+            // btnClose
+            // 
+            this.btnClose.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnClose.Location = new System.Drawing.Point(1096, 547);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(75, 23);
+            this.btnClose.TabIndex = 1;
+            this.btnClose.Text = "閉じる";
+            this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            // 
+            // dgvMain
+            // 
+            this.dgvMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dgvMain.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvMain.Location = new System.Drawing.Point(13, 13);
+            this.dgvMain.Name = "dgvMain";
+            this.dgvMain.RowTemplate.Height = 21;
+            this.dgvMain.Size = new System.Drawing.Size(1158, 516);
+            this.dgvMain.TabIndex = 0;
+            // 
+            // lblReadFile
+            // 
+            this.lblReadFile.AutoSize = true;
+            this.lblReadFile.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblReadFile.Location = new System.Drawing.Point(13, 547);
+            this.lblReadFile.Name = "lblReadFile";
+            this.lblReadFile.Size = new System.Drawing.Size(72, 14);
+            this.lblReadFile.TabIndex = 10;
+            this.lblReadFile.Text = "読取り対象";
+            // 
+            // frmMain
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(1183, 582);
+            this.Controls.Add(this.lblReadFile);
+            this.Controls.Add(this.dgvMain);
+            this.Controls.Add(this.btnClose);
+            this.Controls.Add(this.btnFile);
+            this.Name = "frmMain";
+            this.Text = "コーパス編集";
+            ((System.ComponentModel.ISupportInitialize)(this.dgvMain)).EndInit();
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
+        }
+
+        #endregion
+
+        private System.Windows.Forms.Button btnFile;
+        private System.Windows.Forms.Button btnClose;
+        private System.Windows.Forms.DataGridView dgvMain;
+        private System.Windows.Forms.Label lblReadFile;
+    }
+}
+

@@ -1,0 +1,118 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace MecabEditor
+{
+    //シードマスタ用クラス
+    public class MSeed
+    {
+        private Dictionary<String, Object> dicMembers = new Dictionary<String, Object>();
+
+        //コンストラクタ
+        public MSeed()
+        {
+            dicMembers.Clear();
+            dicMembers.Add(XmlDatas.ListItemNames["SEED_NO"], -1);
+            dicMembers.Add(XmlDatas.ListItemNames["HYOSO_TYPE"], String.Empty);
+            dicMembers.Add(XmlDatas.ListItemNames["LEFT_CONNECT_STATUS_NO"], -1);
+            dicMembers.Add(XmlDatas.ListItemNames["RIGHT_CONNECT_STATUS_NO"], -1);
+            dicMembers.Add(XmlDatas.ListItemNames["COST"], -1);
+            dicMembers.Add(XmlDatas.ListItemNames["HINSHI"], String.Empty);
+            dicMembers.Add(XmlDatas.ListItemNames["HINSHI_DETAIL_1"], String.Empty);
+            dicMembers.Add(XmlDatas.ListItemNames["HINSHI_DETAIL_2"], String.Empty);
+            dicMembers.Add(XmlDatas.ListItemNames["HINSHI_DETAIL_3"], String.Empty);
+            dicMembers.Add(XmlDatas.ListItemNames["KATSUYO_KEI"], String.Empty);
+            dicMembers.Add(XmlDatas.ListItemNames["KATSUYO_TYPE"], String.Empty);
+            dicMembers.Add(XmlDatas.ListItemNames["BASE_TYPE"], String.Empty);
+            dicMembers.Add(XmlDatas.ListItemNames["YOMI"], String.Empty);
+            dicMembers.Add(XmlDatas.ListItemNames["HATSUON"], String.Empty);
+            dicMembers.Add(XmlDatas.ListItemNames["CREATED_AT"], DateTime.MinValue);
+            dicMembers.Add(XmlDatas.ListItemNames["UPDATED_AT"], DateTime.MinValue);
+            dicMembers.Add(XmlDatas.ListItemNames["DELETE_FLAG"], 0);
+            dicMembers.Add(XmlDatas.ListItemNames["DATA_COUNT"], 0);
+        }
+
+        //コピーコンストラクタ
+        public MSeed(MSeed mSeedSource)
+        {
+            dicMembers.Clear();
+            dicMembers.Add(XmlDatas.ListItemNames["SEED_NO"], mSeedSource.DictionaryMembers["SEED_NO"]);
+            dicMembers.Add(XmlDatas.ListItemNames["HYOSO_TYPE"], mSeedSource.DictionaryMembers["HYOSO_TYPE"]);
+            dicMembers.Add(XmlDatas.ListItemNames["LEFT_CONNECT_STATUS_NO"], mSeedSource.DictionaryMembers["LEFT_CONNECT_STATUS_NO"]);
+            dicMembers.Add(XmlDatas.ListItemNames["RIGHT_CONNECT_STATUS_NO"], mSeedSource.DictionaryMembers["RIGHT_CONNECT_STATUS_NO"]);
+            dicMembers.Add(XmlDatas.ListItemNames["COST"], mSeedSource.DictionaryMembers["COST"]);
+            dicMembers.Add(XmlDatas.ListItemNames["HINSHI"], mSeedSource.DictionaryMembers["HINSHI"]);
+            dicMembers.Add(XmlDatas.ListItemNames["HINSHI_DETAIL_1"], mSeedSource.DictionaryMembers["HINSHI_DETAIL_1"]);
+            dicMembers.Add(XmlDatas.ListItemNames["HINSHI_DETAIL_2"], mSeedSource.DictionaryMembers["HINSHI_DETAIL_2"]);
+            dicMembers.Add(XmlDatas.ListItemNames["HINSHI_DETAIL_3"], mSeedSource.DictionaryMembers["HINSHI_DETAIL_3"]);
+            dicMembers.Add(XmlDatas.ListItemNames["KATSUYO_KEI"], mSeedSource.DictionaryMembers["KATSUYO_KEI"]);
+            dicMembers.Add(XmlDatas.ListItemNames["KATSUYO_TYPE"], mSeedSource.DictionaryMembers["KATSUYO_TYPE"]);
+            dicMembers.Add(XmlDatas.ListItemNames["BASE_TYPE"], mSeedSource.DictionaryMembers["BASE_TYPE"]);
+            dicMembers.Add(XmlDatas.ListItemNames["YOMI"], mSeedSource.DictionaryMembers["YOMI"]);
+            dicMembers.Add(XmlDatas.ListItemNames["HATSUON"], mSeedSource.DictionaryMembers["HATSUON"]);
+            dicMembers.Add(XmlDatas.ListItemNames["CREATED_AT"], mSeedSource.DictionaryMembers["CREATED_AT"]);
+            dicMembers.Add(XmlDatas.ListItemNames["UPDATED_AT"], mSeedSource.DictionaryMembers["UPDATED_AT"]);
+            dicMembers.Add(XmlDatas.ListItemNames["DELETE_FLAG"], mSeedSource.DictionaryMembers["DELETE_FLAG"]);
+            dicMembers.Add(XmlDatas.ListItemNames["DATA_COUNT"], mSeedSource.DictionaryMembers["DATA_COUNT"]);
+        }
+
+        //Csvファイルから読み取り
+        public Boolean getFromCsvFile(String strLine)
+        {
+            Boolean bResult = false;
+
+            String[] strLineSplitTab = strLine.Split('\t');
+
+            dicMembers[XmlDatas.ListItemNames["SEED_NO"]] = 0;
+            dicMembers[XmlDatas.ListItemNames["HYOSO_TYPE"]] = strLineSplitTab[0];
+            dicMembers[XmlDatas.ListItemNames["LEFT_CONNECT_STATUS_NO"]] = -1;
+            dicMembers[XmlDatas.ListItemNames["RIGHT_CONNECT_STATUS_NO"]] = -1;
+            dicMembers[XmlDatas.ListItemNames["COST"]] = -1;
+            dicMembers[XmlDatas.ListItemNames["HINSHI"]] = String.Empty;
+            dicMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]] = String.Empty;
+            dicMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]] = String.Empty;
+            dicMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]] = String.Empty;
+            dicMembers[XmlDatas.ListItemNames["KATSUYO_KEI"]] = String.Empty;
+            dicMembers[XmlDatas.ListItemNames["KATSUYO_TYPE"]] = String.Empty;
+            dicMembers[XmlDatas.ListItemNames["BASE_TYPE"]] = String.Empty;
+            dicMembers[XmlDatas.ListItemNames["YOMI"]] = String.Empty;
+            dicMembers[XmlDatas.ListItemNames["HATSUON"]] = String.Empty;
+            dicMembers[XmlDatas.ListItemNames["CREATED_AT"]] = DateTime.Now;
+            dicMembers[XmlDatas.ListItemNames["UPDATED_AT"]] = DateTime.Now;
+            dicMembers[XmlDatas.ListItemNames["DELETE_FLAG"]] = 0;
+            dicMembers[XmlDatas.ListItemNames["DATA_COUNT"]] = 1;
+
+            if (strLineSplitTab.Length > 1)
+            {
+                String[] strLineSplitComma = strLineSplitTab[1].Split(',');
+
+                dicMembers[XmlDatas.ListItemNames["HINSHI"]] = strLineSplitComma[0];
+                dicMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]] = strLineSplitComma[1];
+                dicMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]] = strLineSplitComma[2];
+                dicMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]] = strLineSplitComma[3];
+                dicMembers[XmlDatas.ListItemNames["KATSUYO_KEI"]] = strLineSplitComma[4];
+                dicMembers[XmlDatas.ListItemNames["KATSUYO_TYPE"]] = strLineSplitComma[5];
+                dicMembers[XmlDatas.ListItemNames["BASE_TYPE"]] = strLineSplitComma[6];
+
+                if (strLineSplitComma.Length > 8)
+                {
+                    dicMembers[XmlDatas.ListItemNames["YOMI"]] = strLineSplitComma[7];
+                    dicMembers[XmlDatas.ListItemNames["HATSUON"]] = strLineSplitComma[8];
+                }
+            }
+
+            bResult = true;
+
+            return bResult;
+        }
+
+        public Dictionary<String, Object> DictionaryMembers
+        {
+            get { return dicMembers; }
+            set { dicMembers = value; }
+        }
+    }
+}

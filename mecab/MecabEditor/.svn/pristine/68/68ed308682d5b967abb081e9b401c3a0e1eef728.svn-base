@@ -1,0 +1,520 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace MecabEditor
+{
+    //形態要素置換情報設定画面
+    public partial class frmMorphemeReplaceInfo : Form
+    {
+        //メンバ
+        private List<MorphemeReplaceInfo> lstMorphemeReplaceInfo = new List<MorphemeReplaceInfo>();
+
+        private int intReturnValue = -1;
+        private int intEditMode = -1;               //編集モード 0:追加 1:編集
+
+        private List<MSeed> lstMorphemeReplaceSource = new List<MSeed>();
+        private List<MSeed> lstMorphemeReplaceDestination = new List<MSeed>();
+
+        private SystemInfo sysInfo = new SystemInfo();
+
+        //品詞情報など
+        private List<String> lstHinshi = new List<String>();
+        private List<String> lstHinshiSub1 = new List<String>();
+        private List<String> lstHinshiSub2 = new List<String>();
+        private List<String> lstHinshiSub3 = new List<String>();
+        private List<String> lstKatsuyo1 = new List<String>();
+        private List<String> lstKatsuyo2 = new List<String>();
+
+        private List<MSeed> lstMyLearnSeed = new List<MSeed>();
+
+
+        public frmMorphemeReplaceInfo()
+        {
+            InitializeComponent();
+        }
+
+        //置換変換前追加ボタンクリック時
+        private void btnSourceAdd_Click(object sender, EventArgs e)
+        {
+            frmEditSeed frmEdit = new frmEditSeed();
+            frmEdit.ListHinshi = lstHinshi;
+            frmEdit.ListHinshiSub1 = lstHinshiSub1;
+            frmEdit.ListHinshiSub2 = lstHinshiSub2;
+            frmEdit.ListHinshiSub3 = lstHinshiSub3;
+            frmEdit.ListKatsuyo1 = lstKatsuyo1;
+            frmEdit.ListKatsuyo2 = lstKatsuyo2;
+            frmEdit.systemInfo = sysInfo;
+            frmEdit.ListMyLearnSeed = lstMyLearnSeed;
+            frmEdit.ProcessMode = 1;
+            frmEdit.EditMode = 0;
+            frmEdit.ShowDialog();
+
+            if (frmEdit.ReturnValue == 1)
+            {
+                lstMorphemeReplaceSource.Add(frmEdit.MySeedInfoResult);
+                String[] strLineList = { frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["HYOSO_TYPE"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_KEI"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_TYPE"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["BASE_TYPE"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["YOMI"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["HATSUON"]].ToString() };
+                lstvwMorpemeReplaceInfoSource.Items.Add(new ListViewItem(strLineList));
+            }
+
+            frmEdit.Close();
+            frmEdit.Dispose();
+        }
+
+        //置換変換前編集ボタンクリック時
+        private void btnSourceEdit_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //置換変換前削除ボタンクリック時
+        private void btnSourceDel_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //置換変換後追加ボタンクリック時
+        private void btnDestinationAdd_Click(object sender, EventArgs e)
+        {
+            frmEditSeed frmEdit = new frmEditSeed();
+            frmEdit.ListHinshi = lstHinshi;
+            frmEdit.ListHinshiSub1 = lstHinshiSub1;
+            frmEdit.ListHinshiSub2 = lstHinshiSub2;
+            frmEdit.ListHinshiSub3 = lstHinshiSub3;
+            frmEdit.ListKatsuyo1 = lstKatsuyo1;
+            frmEdit.ListKatsuyo2 = lstKatsuyo2;
+            frmEdit.systemInfo = sysInfo;
+            frmEdit.ListMyLearnSeed = lstMyLearnSeed;
+            frmEdit.ProcessMode = 1;
+            frmEdit.EditMode = 0;
+            frmEdit.ShowDialog();
+
+            if (frmEdit.ReturnValue == 1)
+            {
+                lstMorphemeReplaceDestination.Add(frmEdit.MySeedInfoResult);
+                String[] strLineList = { frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["HYOSO_TYPE"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_KEI"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_TYPE"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["BASE_TYPE"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["YOMI"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["HATSUON"]].ToString() };
+                lstvwMorpemeReplaceInfoDestination.Items.Add(new ListViewItem(strLineList));
+            }
+
+            frmEdit.Close();
+            frmEdit.Dispose();
+        }
+
+        //置換変換後編集ボタンクリック時
+        private void btnDestinationEdit_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //置換変換後削除ボタンクリック時
+        private void btnDestinationDel_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //選択ボタンクリック時
+        private void btnSelect_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //設定ボタンクリック時
+        private void btnSet_Click(object sender, EventArgs e)
+        {
+            if (MyUtils.outputMorphemeReplaceInfoToFile(XmlDatas.ListConsts["MORPHEME_INFO_FILE_PATH"], lstMorphemeReplaceInfo))
+                Close();
+        }
+
+        //閉じるボタンクリック時
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        //フォーム表示後
+        private void frmMorphemeReplaceInfo_Shown(object sender, EventArgs e)
+        {
+            //形態要素置換情報リストの設定
+            if (!setMorphemeReplaceInfoToList())
+            {
+                Close();
+                return;
+            }
+
+            //形態要素置換前情報リストの設定
+            if (!setMorphemeReplaceInfoSourceList())
+            {
+                Close();
+                return;
+            }
+
+            //形態要素置換後情報リストの設定
+            if (!setMorphemeReplaceInfoDestinationList())
+            {
+                Close();
+                return;
+            }
+
+            controlButtons(0);
+        }
+
+        //置換情報をビューに設定する
+        private Boolean setMorphemeReplaceInfoToList()
+        {
+            Boolean bResult = false;
+
+            lstvwMorphemeReplaceInfo.Clear();
+            lstvwMorphemeReplaceInfo.Columns.Add(XmlDatas.ListNames["MORPHEME_REPLACE_INFO_NAME"]);
+
+            lstMorphemeReplaceInfo.ForEach(delegate(MorphemeReplaceInfo morphemeRepInfoEach)
+            {
+                lstvwMorphemeReplaceInfo.Items.Add(morphemeRepInfoEach.MorphemeReplaceInfoName);
+            });
+
+            bResult = true;
+
+            return bResult;
+        }
+
+        //置換前情報リストの設定
+        private Boolean setMorphemeReplaceInfoSourceList()
+        {
+            Boolean bResult = false;
+            
+            lstvwMorpemeReplaceInfoSource.Clear();
+            lstvwMorpemeReplaceInfoSource.Columns.Add(XmlDatas.ListNames["HYOSO_TYPE"]);
+            lstvwMorpemeReplaceInfoSource.Columns.Add(XmlDatas.ListNames["HINSHI"]);
+            lstvwMorpemeReplaceInfoSource.Columns.Add(XmlDatas.ListNames["HINSHI_DETAIL_1"]);
+            lstvwMorpemeReplaceInfoSource.Columns.Add(XmlDatas.ListNames["HINSHI_DETAIL_2"]);
+            lstvwMorpemeReplaceInfoSource.Columns.Add(XmlDatas.ListNames["HINSHI_DETAIL_3"]);
+            lstvwMorpemeReplaceInfoSource.Columns.Add(XmlDatas.ListNames["KATSUYO_KEI"]);
+            lstvwMorpemeReplaceInfoSource.Columns.Add(XmlDatas.ListNames["KATSUYO_TYPE"]);
+            lstvwMorpemeReplaceInfoSource.Columns.Add(XmlDatas.ListNames["BASE_TYPE"]);
+            lstvwMorpemeReplaceInfoSource.Columns.Add(XmlDatas.ListNames["YOMI"]);
+            lstvwMorpemeReplaceInfoSource.Columns.Add(XmlDatas.ListNames["HATSUON"]);
+
+            bResult = true;
+
+            return bResult;
+        }
+
+        //置換後情報リストの設定
+        private Boolean setMorphemeReplaceInfoDestinationList()
+        {
+            Boolean bResult = false;
+
+            lstvwMorpemeReplaceInfoDestination.Clear();
+            lstvwMorpemeReplaceInfoDestination.Columns.Add(XmlDatas.ListNames["HYOSO_TYPE"]);
+            lstvwMorpemeReplaceInfoDestination.Columns.Add(XmlDatas.ListNames["HINSHI"]);
+            lstvwMorpemeReplaceInfoDestination.Columns.Add(XmlDatas.ListNames["HINSHI_DETAIL_1"]);
+            lstvwMorpemeReplaceInfoDestination.Columns.Add(XmlDatas.ListNames["HINSHI_DETAIL_2"]);
+            lstvwMorpemeReplaceInfoDestination.Columns.Add(XmlDatas.ListNames["HINSHI_DETAIL_3"]);
+            lstvwMorpemeReplaceInfoDestination.Columns.Add(XmlDatas.ListNames["KATSUYO_KEI"]);
+            lstvwMorpemeReplaceInfoDestination.Columns.Add(XmlDatas.ListNames["KATSUYO_TYPE"]);
+            lstvwMorpemeReplaceInfoDestination.Columns.Add(XmlDatas.ListNames["BASE_TYPE"]);
+            lstvwMorpemeReplaceInfoDestination.Columns.Add(XmlDatas.ListNames["YOMI"]);
+            lstvwMorpemeReplaceInfoDestination.Columns.Add(XmlDatas.ListNames["HATSUON"]);
+
+            bResult = true;
+
+            return bResult;
+        }
+
+        //getter, setter
+
+        //形態要素置換情報リスト
+        public List<MorphemeReplaceInfo> ListMorphemeReplaceInfo
+        {
+            get { return lstMorphemeReplaceInfo; }
+            set { lstMorphemeReplaceInfo = value; }
+        }
+
+        //返り値
+        public int ReturnValue
+        {
+            get { return intReturnValue; }
+            set { intReturnValue = value; }
+        }
+
+        //システム情報
+        public SystemInfo systemInfo
+        {
+            set { sysInfo = value; }
+        }
+
+        //品詞リスト
+        public List<String> ListHinshi
+        {
+            get { return lstHinshi; }
+            set { lstHinshi = value; }
+        }
+
+        //品詞詳細1リスト
+        public List<String> ListHinshiSub1
+        {
+            get { return lstHinshiSub1; }
+            set { lstHinshiSub1 = value; }
+        }
+
+        //品詞詳細2リスト
+        public List<String> ListHinshiSub2
+        {
+            get { return lstHinshiSub2; }
+            set { lstHinshiSub2 = value; }
+        }
+
+        //品詞詳細3リスト
+        public List<String> ListHinshiSub3
+        {
+            get { return lstHinshiSub3; }
+            set { lstHinshiSub3 = value; }
+        }
+
+        //活用形リスト
+        public List<String> ListKatsuyo1
+        {
+            get { return lstKatsuyo1; }
+            set { lstKatsuyo1 = value; }
+        }
+
+        //活用型リスト
+        public List<String> ListKatsuyo2
+        {
+            get { return lstKatsuyo2; }
+            set { lstKatsuyo2 = value; }
+        }
+
+        //学習用リスト
+        public List<MSeed> ListMyLearnSeed
+        {
+            set { lstMyLearnSeed = value; }
+        }
+
+        //置換情報追加ボタンクリック時
+        private void btnAdd_Click(object sender, EventArgs e)
+        {
+            intEditMode = 0;
+            lstMorphemeReplaceSource.Clear();
+            lstMorphemeReplaceDestination.Clear();
+            controlButtons(1);
+        }
+
+        //置換情報編集ボタンクリック時
+        private void btnEdit_Click(object sender, EventArgs e)
+        {
+            intEditMode = 1;
+            controlButtons(1);
+        }
+
+        //置換情報削除ボタンクリック時
+        private void btnDel_Click(object sender, EventArgs e)
+        {
+            //1件選択されていない場合はエラー
+            if (lstvwMorphemeReplaceInfo.SelectedItems.Count != 1)
+            {
+                MessageBox.Show(String.Format(XmlDatas.ListMessages["ERROR_4"], XmlDatas.ListNames["MORPHEME_REPLACE_INFO"], "1"));
+                return;
+            }
+            
+            if (MessageBox.Show(XmlDatas.ListMessages["CONFIRM_1"], XmlDatas.ListNames["CONFIRM"], MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                int intSelectedIndex = lstvwMorphemeReplaceInfo.SelectedItems[0].Index;
+                lstvwMorphemeReplaceInfo.Items.RemoveAt(intSelectedIndex);
+                lstMorphemeReplaceInfo.RemoveAt(intSelectedIndex);
+            }
+        }
+
+        //決定
+        private void btnTake_Click(object sender, EventArgs e)
+        {
+            if (inputCheck())
+            {
+                //追加の時
+                if (intEditMode == 0)
+                {
+                    MorphemeReplaceInfo morhpemeReplaceInfo = new MorphemeReplaceInfo();
+                    morhpemeReplaceInfo.MorphemeReplaceInfoName = txtName.Text;
+                    morhpemeReplaceInfo.ListSourceCount = lstMorphemeReplaceSource.Count;
+                    morhpemeReplaceInfo.ListSource = new List<MSeed>(lstMorphemeReplaceSource);
+                    morhpemeReplaceInfo.ListDestinationCount = lstMorphemeReplaceDestination.Count;
+                    morhpemeReplaceInfo.ListDestination = new List<MSeed>(lstMorphemeReplaceDestination);
+
+                    lstMorphemeReplaceInfo.Add(morhpemeReplaceInfo);
+                    lstvwMorphemeReplaceInfo.Items.Add(morhpemeReplaceInfo.MorphemeReplaceInfoName);
+                }
+            }
+        }
+
+        //入力チェック
+        private Boolean inputCheck()
+        {
+            Boolean bResult = true;
+
+            List<String> lstMessages = new List<String>();
+
+            //形態要素置換情報名
+            txtName.BackColor = XmlDatas.ListColors["NORMAL_TEXT"];
+
+            if (txtName.Text.Length == 0)
+            {
+                lstMessages.Add(String.Format(XmlDatas.ListMessages["ERROR_3"].ToString(), XmlDatas.ListNames["MORPHEME_REPLACE_INFO_NAME"].ToString()));
+                txtName.BackColor = XmlDatas.ListColors["ERROR_TEXT"];
+                bResult = false;
+            }
+
+            //置換前形態要素
+            if (lstvwMorpemeReplaceInfoSource.Items.Count == 0)
+            {
+                lstMessages.Add(String.Format(XmlDatas.ListMessages["ERROR_3"].ToString(), XmlDatas.ListNames["MORPHEME_REPLACE_INFO_SOURCE"].ToString()));
+                bResult = false;
+            }
+
+            //置換後形態要素
+            if (lstvwMorpemeReplaceInfoDestination.Items.Count == 0)
+            {
+                lstMessages.Add(String.Format(XmlDatas.ListMessages["ERROR_3"].ToString(), XmlDatas.ListNames["MORPHEME_REPLACE_INFO_DESTINATION"].ToString()));
+                bResult = false;
+            }
+
+            String strMessage = String.Empty;
+            if (!bResult)
+            {
+                lstMessages.ForEach(delegate(String strMessageWork)
+                {
+                    strMessage = strMessage + strMessageWork + "\n";
+                });
+                MessageBox.Show(strMessage);
+            }
+            
+            return bResult;
+        }
+
+        //ボタン制御
+        private void controlButtons(int intButtonMode = 0)
+        {
+            Boolean bSetting = true;
+
+            if (intButtonMode == 0)
+                bSetting = false;
+
+            btnSourceAdd.Enabled = bSetting;
+            btnSourceEdit.Enabled = bSetting;
+            btnSourceDel.Enabled = bSetting;
+            btnTake.Enabled = bSetting;
+            btnDestinationAdd.Enabled = bSetting;
+            btnDestinationEdit.Enabled = bSetting;
+            btnDestinationDel.Enabled = bSetting;
+        }
+
+        //選択された置換情報の優先順位を上げる
+        private void btnUp_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        
+        //選択された置換情報の優先順位を下げる
+        private void btnSourceDown_Click(object sender, EventArgs e)
+        {
+            //1件選択されていない場合はエラー
+            if (lstvwMorpemeReplaceInfoSource.SelectedItems.Count != 1)
+            {
+                MessageBox.Show(String.Format(XmlDatas.ListMessages["ERROR_4"], XmlDatas.ListNames["MORPHEME_REPLACE_INFO"], "1"));
+                return;
+            }
+
+            int intSelectedIndex = lstvwMorpemeReplaceInfoSource.SelectedItems[0].Index;
+            if (intSelectedIndex == 0)
+                return;
+
+            var temp = lstvwMorpemeReplaceInfoSource.Items[intSelectedIndex + 1];
+            lstvwMorpemeReplaceInfoSource.Items[intSelectedIndex + 1] = lstvwMorpemeReplaceInfoSource.Items[intSelectedIndex];
+            lstvwMorpemeReplaceInfoSource.Items[intSelectedIndex] = temp;
+
+            var temp2 = lstMorphemeReplaceSource[intSelectedIndex + 1];
+            lstMorphemeReplaceSource[intSelectedIndex + 1] = lstMorphemeReplaceSource[intSelectedIndex];
+            lstMorphemeReplaceSource[intSelectedIndex] = temp2;
+        }
+
+        //選択された置換情報の優先順位を上げる
+        private void btnSourceUp_Click(object sender, EventArgs e)
+        {
+            //1件選択されていない場合はエラー
+            if (lstvwMorpemeReplaceInfoSource.SelectedItems.Count != 1)
+            {
+                MessageBox.Show(String.Format(XmlDatas.ListMessages["ERROR_4"], XmlDatas.ListNames["MORPHEME_REPLACE_INFO"], "1"));
+                return;
+            }
+
+            int intSelectedIndex = lstvwMorpemeReplaceInfoSource.SelectedItems[0].Index;
+            if (intSelectedIndex == 0)
+                return;
+
+            var temp = lstvwMorpemeReplaceInfoSource.Items[intSelectedIndex - 1];
+            lstvwMorpemeReplaceInfoSource.Items[intSelectedIndex - 1] = lstvwMorpemeReplaceInfoSource.Items[intSelectedIndex];
+            lstvwMorpemeReplaceInfoSource.Items[intSelectedIndex] = temp;
+
+            var temp2 = lstMorphemeReplaceSource[intSelectedIndex - 1];
+            lstMorphemeReplaceSource[intSelectedIndex - 1] = lstMorphemeReplaceSource[intSelectedIndex];
+            lstMorphemeReplaceSource[intSelectedIndex] = temp2;
+        }
+
+        //選択された置換情報の優先順位を上げる
+        private void btnUp_Click_1(object sender, EventArgs e)
+        {
+            //1件選択されていない場合はエラー
+            if (lstvwMorphemeReplaceInfo.SelectedItems.Count != 1)
+            {
+                MessageBox.Show(String.Format(XmlDatas.ListMessages["ERROR_4"], XmlDatas.ListNames["MORPHEME_REPLACE_INFO"], "1"));
+                return;
+            }
+
+            int intSelectedIndex = lstvwMorphemeReplaceInfo.SelectedItems[0].Index;
+            if (intSelectedIndex == 0)
+                return;
+
+            String temp = lstvwMorphemeReplaceInfo.Items[intSelectedIndex - 1].Text;
+            String temp2 = lstvwMorphemeReplaceInfo.Items[intSelectedIndex].Text;
+            lstvwMorphemeReplaceInfo.Items.RemoveAt(intSelectedIndex - 1);
+            lstvwMorphemeReplaceInfo.Items.Insert(intSelectedIndex - 1, temp2);
+            lstvwMorphemeReplaceInfo.Items.RemoveAt(intSelectedIndex);
+            lstvwMorphemeReplaceInfo.Items.Insert(intSelectedIndex, temp);
+
+            var temp3 = lstMorphemeReplaceInfo[intSelectedIndex - 1];
+            lstMorphemeReplaceInfo[intSelectedIndex - 1] = lstMorphemeReplaceInfo[intSelectedIndex];
+            lstMorphemeReplaceInfo[intSelectedIndex] = temp3;
+        }
+
+        //選択された置換情報の優先順位を下げる
+        private void btnDown_Click(object sender, EventArgs e)
+        {
+            //1件選択されていない場合はエラー
+            if (lstvwMorphemeReplaceInfo.SelectedItems.Count != 1)
+            {
+                MessageBox.Show(String.Format(XmlDatas.ListMessages["ERROR_4"], XmlDatas.ListNames["MORPHEME_REPLACE_INFO"], "1"));
+                return;
+            }
+
+            int intSelectedIndex = lstvwMorphemeReplaceInfo.SelectedItems[0].Index;
+            if (intSelectedIndex == 0)
+                return;
+
+            String temp = lstvwMorphemeReplaceInfo.Items[intSelectedIndex + 1].Text;
+            String temp2 = lstvwMorphemeReplaceInfo.Items[intSelectedIndex].Text;
+            lstvwMorphemeReplaceInfo.Items.RemoveAt(intSelectedIndex + 1);
+            lstvwMorphemeReplaceInfo.Items.Insert(intSelectedIndex + 1, temp2);
+            lstvwMorphemeReplaceInfo.Items.RemoveAt(intSelectedIndex);
+            lstvwMorphemeReplaceInfo.Items.Insert(intSelectedIndex, temp);
+
+            var temp3 = lstMorphemeReplaceInfo[intSelectedIndex + 1];
+            lstMorphemeReplaceInfo[intSelectedIndex + 1] = lstMorphemeReplaceInfo[intSelectedIndex];
+            lstMorphemeReplaceInfo[intSelectedIndex] = temp3;
+        }
+    }
+}

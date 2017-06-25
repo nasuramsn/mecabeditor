@@ -1,0 +1,42 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace MecabEditor
+{
+    //シードマスタ用クラス
+    public class MSeed
+    {
+        private Dictionary<String, Object> dicMembers = new Dictionary<String, Object>();
+
+        public MSeed()
+        {
+            dicMembers.Clear();
+            dicMembers.Add(XmlDatas.ListItemNames["SEED_NO"], -1);
+            dicMembers.Add(XmlDatas.ListItemNames["HYOSO_TYPE"], String.Empty);
+            dicMembers.Add(XmlDatas.ListItemNames["LEFT_CONNECT_STATUS_NO"], -1);
+            dicMembers.Add(XmlDatas.ListItemNames["RIGHT_CONNECT_STATUS_NO"], -1);
+            dicMembers.Add(XmlDatas.ListItemNames["HINSHI"], String.Empty);
+            dicMembers.Add(XmlDatas.ListItemNames["HINSHI_DETAIL_1"], String.Empty);
+            dicMembers.Add(XmlDatas.ListItemNames["HINSHI_DETAIL_2"], String.Empty);
+            dicMembers.Add(XmlDatas.ListItemNames["HINSHI_DETAIL_3"], String.Empty);
+            dicMembers.Add(XmlDatas.ListItemNames["KATSUYO_KEI"], String.Empty);
+            dicMembers.Add(XmlDatas.ListItemNames["KATSUYO_TYPE"], String.Empty);
+            dicMembers.Add(XmlDatas.ListItemNames["BASE_TYPE"], String.Empty);
+            dicMembers.Add(XmlDatas.ListItemNames["YOMI"], String.Empty);
+            dicMembers.Add(XmlDatas.ListItemNames["HATSUON"], String.Empty);
+            dicMembers.Add(XmlDatas.ListItemNames["CREATED_AT"], DateTime.MinValue);
+            dicMembers.Add(XmlDatas.ListItemNames["UPDATED_AT"], DateTime.MinValue);
+            dicMembers.Add(XmlDatas.ListItemNames["DELETE_FLAG"], 0);
+            dicMembers.Add(XmlDatas.ListItemNames["DATA_COUNT"], 0);
+        }
+
+        public Dictionary<String, Object> DictionaryMembers
+        {
+            get { return dicMembers; }
+            set { dicMembers = value; }
+        }
+    }
+}

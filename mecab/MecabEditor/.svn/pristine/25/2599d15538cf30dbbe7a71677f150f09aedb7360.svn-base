@@ -1,0 +1,29 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace MecabEditor
+{
+    //色々な用途に使う関数
+    static public class MyUtils
+    {
+        //コンストラクタ
+        static MyUtils()
+        {
+        }
+
+        //sjisからutf8に変更
+        static public String changeSjisToUtf8(String strSource)
+        {
+            String strResult = String.Empty;
+            byte[] byteDatas;
+
+            byteDatas = System.Text.Encoding.GetEncoding(932).GetBytes(strSource);
+            strResult = System.Text.Encoding.UTF8.GetString(byteDatas);
+
+            return strResult;
+        }
+    }
+}

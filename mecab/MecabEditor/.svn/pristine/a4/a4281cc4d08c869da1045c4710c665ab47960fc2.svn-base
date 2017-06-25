@@ -1,0 +1,78 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml;
+
+namespace MecabEditor
+{
+    public static class XmlDatas
+    {
+        private static Dictionary<String, String> lstItemNames = new Dictionary<String, String>();
+        private static Dictionary<String, String> lstNames = new Dictionary<String, String>();
+        
+        static XmlDatas()
+        {
+            lstItemNames.Clear();
+            lstNames.Clear();
+
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(@"./xmls/ItemNames.xml");
+            
+            //foreach (XmlNode xmlNodeWork in xmlDoc.ChildNodes)
+            //{
+                //if (xmlNodeWork.ChildNodes.Count > 0)
+                //{
+                    //foreach (XmlNode childNodeWork in xmlNodeWork.ChildNodes)
+                    //{
+                        //lstItemNames.Add(childNodeWork.InnerXml, childNodeWork.InnerText);
+                    //}
+                //}
+            //}
+
+            XmlNodeList itemNamesList = xmlDoc.SelectNodes(@"//ItemNames");
+
+            for (int i = 0; i < itemNamesList.Count; i++)
+            {
+                foreach (XmlNode childNodeWork in itemNamesList[i].ChildNodes)
+                {
+                    lstItemNames.Add(childNodeWork.Name, childNodeWork.InnerText);
+                }
+            }
+
+            XmlDocument xmlNameDoc = new XmlDocument();
+            xmlNameDoc.Load(@"./xmls/Names.xml");
+
+            XmlNodeList namesList = xmlNameDoc.SelectNodes(@"//Names");
+
+            for (int i = 0; i < namesList.Count; i++)
+            {
+                foreach (XmlNode childNodeWork in namesList[i].ChildNodes)
+                {
+                    lstNames.Add(childNodeWork.Name, childNodeWork.InnerText);
+                }
+            }
+        }
+
+        //static XmlDatas()
+        //{
+            //XmlDatas myXmlDatas = new XmlDatas();
+        //}
+
+        //DB用項目名
+        public static Dictionary<String, String> ListItemNames
+        {
+            get { return lstItemNames; }
+            set { lstItemNames = value; }
+        }
+
+        //項目名
+        public static Dictionary<String, String> ListNames
+        {
+            get { return lstNames; }
+            set { lstNames = value; }
+        }
+    }
+}

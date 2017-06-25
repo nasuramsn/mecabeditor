@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<Names>
+  <BASE_TYPE>基本形</BASE_TYPE>
+  <CONFIRM>確認</CONFIRM>
+  <COPUS>コーパス</COPUS>
+  <COPUS_COUNT>コーパス回数用</COPUS_COUNT>
+  <COPUS_EDIT>コーパス編集用</COPUS_EDIT>
+  <COPUS_NUMBER>コーパス個数</COPUS_NUMBER>
+  <COST>コスト</COST>
+  <DATA_COUNT>出現回数</DATA_COUNT>
+  <EDIT>編集</EDIT>
+  <FOLDER>フォルダ</FOLDER>
+  <LEARNING_CSV>学習用辞書</LEARNING_CSV>
+  <HATSUON>発音</HATSUON>
+  <HINSHI>品詞</HINSHI>
+  <HINSHI_DETAIL_1>品詞詳細1</HINSHI_DETAIL_1>
+  <HINSHI_DETAIL_2>品詞詳細2</HINSHI_DETAIL_2>
+  <HINSHI_DETAIL_3>品詞詳細3</HINSHI_DETAIL_3>
+  <KATSUYO_KEI>活用形</KATSUYO_KEI>
+  <KATSUYO_TYPE>活用型</KATSUYO_TYPE>
+  <HYOSO_TYPE>表層系</HYOSO_TYPE>
+  <TOTAL>集計</TOTAL>
+  <YOMI>読み</YOMI>
+</Names>

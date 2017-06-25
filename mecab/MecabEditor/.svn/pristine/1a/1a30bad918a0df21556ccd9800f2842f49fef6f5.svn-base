@@ -1,0 +1,1349 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace MecabEditor
+{
+    public partial class frmMain : Form
+    {
+        private List<MSeed> lstMSeed = new List<MSeed>();
+        private List<MSeed> lstAllMSeed = new List<MSeed>();
+        private List<MSeed> lstMyMSeed = new List<MSeed>();
+
+        //品詞情報など
+        private List<String> lstHinshi = new List<String>();
+        private List<String> lstHinshiSub1 = new List<String>();
+        private List<String> lstHinshiSub2 = new List<String>();
+        private List<String> lstHinshiSub3 = new List<String>();
+        private List<String> lstKatsuyo1 = new List<String>();
+        private List<String> lstKatsuyo2 = new List<String>();
+
+        private List<MorphemeReplaceInfo> lstMorphemeReplaceInfo = new List<MorphemeReplaceInfo>();
+
+        private SystemInfo systemInfo = new SystemInfo();
+
+        private String strCoupusFilePath = String.Empty;
+        private String strCsvFilePath = String.Empty;
+
+        
+        public frmMain()
+        {
+            InitializeComponent();
+        }
+
+        //フォームを閉じる
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        //ファイルを開く
+        private void btnFile_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofdRead = new OpenFileDialog();
+            ofdRead.Title = "ファイルを指定してください";
+            ofdRead.InitialDirectory = systemInfo.ListMembers["SEED_DIRECTORY_PATH"].ToString();
+            if (ofdRead.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                String strFileName = ofdRead.FileName;
+                if (!System.IO.File.Exists(@strFileName))
+                {
+                    MessageBox.Show("ファイルが存在しません");
+                    return;
+                }
+
+                lblFilePath.Text = strFileName;
+
+                if (!createCopusListFromFile(@strFileName))
+                    return;
+
+                lblCopusInfo.Text = XmlDatas.ListNames["COPUS_NUMBER"] + ":" + lstMSeed.Count.ToString();
+            }
+        }
+
+        //ファイルからコーパスのリストを作成する
+        private Boolean createCopusListFromFile(String strFileName)
+        {
+            StreamReader strReader = null;
+            Boolean bResult = false;
+
+            int intEditMode = cmbEditMode.SelectedIndex;
+
+            lstMSeed.Clear();
+
+            try
+            {
+                strReader = new StreamReader(@strFileName);
+
+                if (intEditMode == 1)
+                {
+                    if (!createCopusTotalDataList(strReader))
+                    {
+                        MessageBox.Show("コーパスの集計リストの作成に失敗しました");
+                        return bResult;
+                    }
+                }
+                else if (intEditMode == 0)
+                {
+                    if (!createCopusDataList(strReader))
+                    {
+                        MessageBox.Show("コーパスのリストの作成に失敗しました");
+                        return bResult;
+                    }
+                }
+            
+                if (!setMainListView(intEditMode))
+                    return bResult;
+
+                bResult = true;
+            }
+            catch (IOException ioe)
+            {
+                MessageBox.Show(ioe.Message);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                if (strReader != null)
+                {
+                    strReader.Close();
+                    strReader.Dispose();
+                }
+            }
+
+            return bResult;
+        }
+
+        //コーパスの集計データリストの作成
+        private Boolean createCopusTotalDataList(StreamReader strReaderWork)
+        {
+            Boolean bResult = false;
+
+            while (!strReaderWork.EndOfStream)
+            {
+                String strLine = strReaderWork.ReadLine();
+                String[] strLineSplitTab = strLine.Split('\t');
+
+                if (strLineSplitTab.Length > 1)
+                {
+                    String[] strLineSplitComma = strLineSplitTab[1].Split(',');
+
+                    //既存のリストにないか検索する
+                    Boolean bIsExist = false;
+                    lstMSeed.ForEach(delegate(MSeed mSeedSearch)
+                    {
+                        if (mSeedSearch.DictionaryMembers[XmlDatas.ListItemNames["HYOSO_TYPE"]].ToString().Equals(strLineSplitTab[0]) && mSeedSearch.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString().Equals(strLineSplitComma[0]))
+                        {
+                            bIsExist = true;
+                            int intCountWork = int.Parse(mSeedSearch.DictionaryMembers[XmlDatas.ListItemNames["DATA_COUNT"]].ToString());
+                            intCountWork++;
+                            mSeedSearch.DictionaryMembers[XmlDatas.ListItemNames["DATA_COUNT"]] = intCountWork;
+                        }
+                    });
+                    
+                    if (!bIsExist)
+                    {
+                        MSeed mSeedWork = new MSeed();
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["SEED_NO"]] = 0;
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HYOSO_TYPE"]] = strLineSplitTab[0];
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["LEFT_CONNECT_STATUS_NO"]] = 1000;
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["RIGHT_CONNECT_STATUS_NO"]] = 1000;
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["COST"]] = 100;
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]] = strLineSplitComma[0];
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]] = strLineSplitComma[1];
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]] = strLineSplitComma[2];
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]] = strLineSplitComma[3];
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_KEI"]] = strLineSplitComma[4];
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_TYPE"]] = strLineSplitComma[5];
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["BASE_TYPE"]] = strLineSplitComma[6];
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["YOMI"]] = String.Empty;
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HATSUON"]] = String.Empty;
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["CREATED_AT"]] = DateTime.Now;
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["UPDATED_AT"]] = DateTime.Now;
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["DELETE_FLAG"]] = 0;
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["DATA_COUNT"]] = 1;
+
+                        if (strLineSplitComma.Length > 8)
+                        {
+                            mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["YOMI"]] = strLineSplitComma[7];
+                            mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HATSUON"]] = strLineSplitComma[8];
+                        }
+
+                        lstMSeed.Add(mSeedWork);
+                    }
+                }
+            }
+
+            bResult = true;
+
+            return bResult;
+        }
+
+        //コーパスのデータリスト作成
+        private Boolean createCopusDataList(StreamReader strReaderWork)
+        {
+            Boolean bResult = false;
+
+            while (!strReaderWork.EndOfStream)
+            {
+                String strLine = strReaderWork.ReadLine();
+                MSeed mSeedWork = new MSeed();
+                
+                if (mSeedWork.getFromCsvFile(@strLine))
+                    lstMSeed.Add(mSeedWork);
+            }
+
+            bResult = true;
+
+            return bResult;
+        }
+
+        //Form表示後の処理
+        private void frmMain_Shown(object sender, EventArgs e)
+        {
+            cmbEditMode.Items.Clear();
+            cmbEditMode.Items.Add(XmlDatas.ListNames["EDIT"]);
+            cmbEditMode.Items.Add(XmlDatas.ListNames["TOTAL"]);
+            cmbEditMode.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbEditMode.SelectedIndex = 0;
+
+            btnAdd.Enabled = true;
+            btnEdit.Enabled = true;
+            btnDel.Enabled = true;
+
+            if (!readSystemInfos())
+                return;
+
+            if (systemInfo.ListMembers.Count == 0)
+            {
+                frmSetSystemInfo frmSetSysInfo = new frmSetSystemInfo();
+                frmSetSysInfo.mySystemInfo = systemInfo;
+                frmSetSysInfo.ShowDialog();
+            }
+
+            if (!setHinshiInfos())
+                return;
+
+            //学習用CSVファイルを開く
+            if (!ReadLearnCsvFiles())
+                return;
+
+            //形態要素置換情報を読み込む
+            if (!MyUtils.getMorphemeReplaceInfoFromFile(@XmlDatas.ListConsts["MORPHEME_INFO_FILE_PATH"].ToString(), ref lstMorphemeReplaceInfo))
+                return;
+        }
+
+        //システム情報の読み取り
+        private Boolean readSystemInfos()
+        {
+            Boolean bResult = false;
+            String strFileName = XmlDatas.ListConsts["SETTING_INI_FILE_PATH"].ToString();
+            StreamReader strrdr = null;
+
+            try
+            {
+                strrdr = new StreamReader(@strFileName, Encoding.GetEncoding("utf-8"));
+
+                while (!strrdr.EndOfStream)
+                {
+                    String strLine = strrdr.ReadLine();
+                    if (strLine.IndexOf(XmlDatas.ListConsts["SEED_DIRECTORY_PATH_HEADER"].ToString()) >= 0)
+                    {
+                        strLine = strLine.Replace(XmlDatas.ListConsts["SEED_DIRECTORY_PATH_HEADER"].ToString(), String.Empty);
+                        systemInfo.ListMembers[XmlDatas.ListConsts["SEED_DIRECTORY_PATH"]] = strLine;
+                    }
+                    else if (strLine.IndexOf(XmlDatas.ListConsts["CSV_DIRECTORY_PATH_HEADER"].ToString()) >= 0)
+                    {
+                        strLine = strLine.Replace(XmlDatas.ListConsts["CSV_DIRECTORY_PATH_HEADER"].ToString(), String.Empty);
+                        systemInfo.ListMembers[XmlDatas.ListConsts["CSV_DIRECTORY_PATH"]] = strLine;
+                    }
+                }
+
+                bResult = true;
+            }
+            catch (IOException ioe)
+            {
+                MessageBox.Show(ioe.Message);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                if (strrdr != null)
+                {
+                    strrdr.Close();
+                    strrdr.Dispose();
+                }
+            }
+
+            return bResult;
+        }
+
+        //品詞情報なｄの取得
+        private Boolean setHinshiInfos()
+        {
+            Boolean bResult = false;
+
+            bResult = setInfosFromFiles(XmlDatas.ListConsts["HINSHI_TXT_FILE_PATH"], ref lstHinshi);
+            if (!bResult)
+                return bResult;
+
+            Debug.WriteLine("品詞情報設定完了");
+
+            bResult = setInfosFromFiles(XmlDatas.ListConsts["HINSHI_SUB1_TXT_FILE_PATH"], ref lstHinshiSub1);
+            if (!bResult)
+                return bResult;
+
+            Debug.WriteLine("品詞詳細1情報設定完了");
+
+            bResult = setInfosFromFiles(XmlDatas.ListConsts["HINSHI_SUB2_TXT_FILE_PATH"], ref lstHinshiSub2);
+            if (!bResult)
+                return bResult;
+
+            Debug.WriteLine("品詞詳細2情報設定完了");
+
+            bResult = setInfosFromFiles(XmlDatas.ListConsts["HINSHI_SUB3_TXT_FILE_PATH"], ref lstHinshiSub3);
+            if (!bResult)
+                return bResult;
+
+            Debug.WriteLine("品詞詳細3情報設定完了");
+
+            bResult = setInfosFromFiles(XmlDatas.ListConsts["KATSUYO1_TXT_FILE_PATH"], ref lstKatsuyo1);
+            if (!bResult)
+                return bResult;
+
+            Debug.WriteLine("活用1情報設定完了");
+
+            bResult = setInfosFromFiles(XmlDatas.ListConsts["KATSUYO2_TXT_FILE_PATH"], ref lstKatsuyo2);
+            if (!bResult)
+                return bResult;
+
+            Debug.WriteLine("活用2情報設定完了");
+
+            return bResult;
+        }
+
+        //Textファイルから各種情報を取得する
+        private Boolean setInfosFromFiles(String strFilePath, ref List<String> lstInfosParam)
+        {
+            Boolean bResult = false;
+            StreamReader strrdr = null;
+            String strText = String.Empty;
+
+            try
+            {
+                lstInfosParam.Clear();
+                strrdr = new StreamReader(@strFilePath, Encoding.GetEncoding("utf-8"));
+                
+                while (!strrdr.EndOfStream)
+                {
+                    strText = strrdr.ReadLine();
+                    if (strText.Length > 0)
+                        lstInfosParam.Add(strText);
+                }
+
+                bResult = true;
+            }
+            catch (IOException ioe)
+            {
+                MessageBox.Show(ioe.Message);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                if (strrdr != null)
+                {
+                    strrdr.Close();
+                    strrdr.Dispose();
+                }
+            }
+
+            return bResult;
+        }
+
+        //学習用Csvファイルの読み取り
+        private Boolean ReadLearnCsvFiles()
+        {
+            Boolean bResult = false;
+            StreamReader strReader = null;
+            String strFileName = systemInfo.ListMembers["CSV_DIRECTORY_PATH"] + "\\" + "mylean.csv";
+
+
+            try
+            {
+                lstMyMSeed.Clear();
+                strReader = new StreamReader(@strFileName, Encoding.GetEncoding("utf-8"));
+
+                while (!strReader.EndOfStream)
+                {
+                    String strLine = strReader.ReadLine();
+                    String[] strLineSplitComma = strLine.Split(',');
+                
+                    MSeed mSeedWork = new MSeed();
+                    mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["SEED_NO"]] = 0;
+                    mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HYOSO_TYPE"]] = strLineSplitComma[0];
+                    mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["LEFT_CONNECT_STATUS_NO"]] = -1;
+                    mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["RIGHT_CONNECT_STATUS_NO"]] = -1;
+                    mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["COST"]] = -1;
+                    mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]] = String.Empty;
+                    mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]] = String.Empty;
+                    mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]] = String.Empty;
+                    mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]] = String.Empty;
+                    mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_KEI"]] = String.Empty;
+                    mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_TYPE"]] = String.Empty;
+                    mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["BASE_TYPE"]] = String.Empty;
+                    mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["YOMI"]] = String.Empty;
+                    mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HATSUON"]] = String.Empty;
+                    mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["CREATED_AT"]] = DateTime.Now;
+                    mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["UPDATED_AT"]] = DateTime.Now;
+                    mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["DELETE_FLAG"]] = 0;
+                    mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["DATA_COUNT"]] = 1;
+
+                    if (strLineSplitComma.Length > 1)
+                    {
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["LEFT_CONNECT_STATUS_NO"]] = int.Parse(strLineSplitComma[1]);
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["RIGHT_CONNECT_STATUS_NO"]] = int.Parse(strLineSplitComma[2]);
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["COST"]] = int.Parse(strLineSplitComma[3]);
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]] = strLineSplitComma[4];
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]] = strLineSplitComma[5];
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]] = strLineSplitComma[6];
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]] = strLineSplitComma[7];
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_KEI"]] = strLineSplitComma[8];
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_TYPE"]] = strLineSplitComma[9];
+                        mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["BASE_TYPE"]] = strLineSplitComma[10];
+
+                        if (strLineSplitComma.Length > 11)
+                        {
+                            mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["YOMI"]] = strLineSplitComma[11];
+                            mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HATSUON"]] = strLineSplitComma[12];
+                        }
+                    }
+
+                    lstMyMSeed.Add(mSeedWork);
+
+                    //品詞リストにないものがあれば追加しておく
+                    Boolean bHit = false;
+
+                    lstHinshi.ForEach(delegate(String strHinshiWork)
+                    {
+                        if (strHinshiWork.Equals(mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString()))
+                            bHit = true;
+                    });
+
+                    if (!bHit)
+                        lstHinshi.Add(mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString());
+
+                    //品詞詳細1リストにないものがあれば追加しておく
+                    bHit = false;
+
+                    lstHinshiSub1.ForEach(delegate(String strHinshiSub1Work)
+                    {
+                        if (strHinshiSub1Work.Equals(mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]].ToString()))
+                            bHit = true;
+                    });
+
+                    if (!bHit)
+                        lstHinshiSub1.Add(mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]].ToString());
+
+                    //品詞詳細2リストにないものがあれば追加しておく
+                    bHit = false;
+
+                    lstHinshiSub2.ForEach(delegate(String strHinshiSub2Work)
+                    {
+                        if (strHinshiSub2Work.Equals(mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]].ToString()))
+                            bHit = true;
+                    });
+
+                    if (!bHit)
+                        lstHinshiSub2.Add(mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]].ToString());
+
+                    //品詞詳細3リストにないものがあれば追加しておく
+                    bHit = false;
+
+                    lstHinshiSub3.ForEach(delegate(String strHinshiSub3Work)
+                    {
+                        if (strHinshiSub3Work.Equals(mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]].ToString()))
+                            bHit = true;
+                    });
+
+                    if (!bHit)
+                        lstHinshiSub3.Add(mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]].ToString());
+
+                    //活用形リストにないものがあれば追加しておく
+                    bHit = false;
+
+                    lstKatsuyo1.ForEach(delegate(String strKatsuyo1Work)
+                    {
+                        if (strKatsuyo1Work.Equals(mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_KEI"]].ToString()))
+                            bHit = true;
+                    });
+
+                    if (!bHit)
+                        lstKatsuyo1.Add(mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_KEI"]].ToString());
+
+                    //活用型リストにないものがあれば追加しておく
+                    bHit = false;
+
+                    lstKatsuyo2.ForEach(delegate(String strKatsuyo2Work)
+                    {
+                        if (strKatsuyo2Work.Equals(mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_TYPE"]].ToString()))
+                            bHit = true;
+                    });
+
+                    if (!bHit)
+                        lstKatsuyo2.Add(mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_TYPE"]].ToString());
+                }
+
+                //学習用要素のソート
+                lstMyMSeed.Sort(delegate(MSeed seedA, MSeed seedB)
+                {
+                    int intCompA = String.Compare(seedA.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString(), seedB.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString());
+                    if (intCompA == 0)
+                    {
+                        int intCompB = String.Compare(seedA.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]].ToString(), seedB.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]].ToString());
+                        if (intCompB == 0)
+                        {
+                            int intCompC = String.Compare(seedA.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]].ToString(), seedB.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]].ToString());
+                            if (intCompC == 0)
+                            {
+                                int intCompD = String.Compare(seedA.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]].ToString(), seedB.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]].ToString());
+                                if (intCompD == 0)
+                                {
+                                    int intCompE = String.Compare(seedA.DictionaryMembers[XmlDatas.ListItemNames["HYOSO_TYPE"]].ToString(), seedB.DictionaryMembers[XmlDatas.ListItemNames["HYOSO_TYPE"]].ToString());
+                                    return intCompE;
+                                }
+                                else
+                                {
+                                    return intCompD;
+                                }
+                            }
+                            else
+                            {
+                                return intCompC;
+                            }
+                        }
+                        else
+                        {
+                            return intCompB;
+                        }
+                    }
+                    else
+                    {
+                        return intCompA;
+                    }
+                });
+
+                //品詞等ののソート
+                lstHinshi.Sort();
+                lstHinshiSub1.Sort();
+                lstHinshiSub2.Sort();
+                lstHinshiSub3.Sort();
+                lstKatsuyo1.Sort();
+                lstKatsuyo2.Sort();
+
+
+                bResult = true;
+            }
+            catch (IOException ioe)
+            {
+                MessageBox.Show(ioe.Message);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                if (strReader != null)
+                {
+                    strReader.Close();
+                    strReader.Dispose();
+                }
+            }
+
+            return bResult;
+        }
+
+
+        //コーパスファイルの出力
+        private Boolean outputCopusFile(String strFileName = "")
+        {
+            Boolean bResult = false;
+            StreamWriter strwtr = null;
+
+            if (strFileName.Equals(String.Empty))
+            {
+                SaveFileDialog sfd = new SaveFileDialog();
+                sfd.Filter = "Text File (*.txt)|*.txt|All Files (*.*)|*.*";
+                sfd.DefaultExt = "txt";
+
+                if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    strFileName = sfd.FileName;
+                    strCoupusFilePath = sfd.FileName;
+                } 
+                else 
+                {
+                    return bResult;
+                }
+            }
+
+            try
+            {
+                strwtr = new StreamWriter(@strFileName, false, Encoding.UTF8);
+
+                if (cmbEditMode.SelectedIndex == 0)
+                {
+                    lstMSeed.ForEach(delegate(MSeed mSeedWork)
+                    {
+                        String strOutputWork = mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HYOSO_TYPE"]].ToString();
+                        if (!mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString().Equals(String.Empty))
+                        {
+                            strOutputWork = strOutputWork + "\t" + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_KEI"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_TYPE"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["BASE_TYPE"]].ToString();
+                        }
+
+                        if (!mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["YOMI"]].ToString().Equals(String.Empty))
+                        {
+                            strOutputWork = strOutputWork + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["YOMI"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HATSUON"]].ToString();
+                        }
+
+                        strwtr.WriteLine(strOutputWork);
+                    });
+
+                    MessageBox.Show(String.Format(XmlDatas.ListMessages["INFORMATION_1"], XmlDatas.ListNames["COPUS_EDIT"]));
+                }
+                else
+                {
+                    lstMSeed.ForEach(delegate(MSeed mSeedWork)
+                    {
+                        strwtr.WriteLine(mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HYOSO_TYPE"]] + "\t" + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]] + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]] + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]] + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]] + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["DATA_COUNT"]]);
+                    });
+
+                    MessageBox.Show(String.Format(XmlDatas.ListMessages["INFORMATION_1"], XmlDatas.ListNames["COPUS_COUNT"]));
+                }
+
+                bResult = true;
+            }
+            catch (IOException ioe)
+            {
+                MessageBox.Show(ioe.Message);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                if (strwtr != null)
+                {
+                    strwtr.Close();
+                    strwtr.Dispose();
+                }
+            }
+
+            return bResult;
+        }
+
+        //csvファイルの出力
+        private Boolean outputCsvFile(String strFilePath = "")
+        {
+            Boolean bResult = false;
+            //StreamWriter strwtr = null;
+
+            if (strFilePath.Equals(String.Empty))
+            {
+                SaveFileDialog sfd = new SaveFileDialog();
+                sfd.Filter = "Csv File (*.csv)|*.csv|All Files (*.*)|*.*";
+                sfd.DefaultExt = "csv";
+
+                if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    strFilePath = sfd.FileName;
+                    strCsvFilePath = sfd.FileName;
+                }
+            }
+
+            if (!MyUtils.outputCsvFile(@strCsvFilePath, lstMyMSeed))
+                return bResult;
+
+                
+            return bResult;
+        }
+
+        //コーパスの編集と集計の切り替え
+        private void cmbEditMode_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cmbEditMode.SelectedIndex == 0)
+            {
+                btnAdd.Enabled = true;
+                btnEdit.Enabled = true;
+                btnDel.Enabled = true;
+            }
+            else
+            {
+                btnAdd.Enabled = false;
+                btnEdit.Enabled = false;
+                btnDel.Enabled = false;
+            }
+
+            if (lblFilePath.Text.Length > 0)
+            {
+                if (!createCopusListFromFile(@lblFilePath.Text))
+                    return;
+            }
+        }
+
+        //要素追加
+        private void btnAdd_Click(object sender, EventArgs e)
+        {
+            frmEditSeed frmEdit = new frmEditSeed();
+            frmEdit.ListHinshi = lstHinshi;
+            frmEdit.ListHinshiSub1 = lstHinshiSub1;
+            frmEdit.ListHinshiSub2 = lstHinshiSub2;
+            frmEdit.ListHinshiSub3 = lstHinshiSub3;
+            frmEdit.ListKatsuyo1 = lstKatsuyo1;
+            frmEdit.ListKatsuyo2 = lstKatsuyo2;
+            frmEdit.ProcessMode = 0;
+            frmEdit.EditMode = 0;
+            frmEdit.systemInfo = systemInfo;
+            frmEdit.ListMyLearnSeed = lstMyMSeed;
+            frmEdit.ShowDialog();
+
+            if (frmEdit.ReturnValue == 1)
+            {
+                lstMyMSeed.Clear();
+                frmEdit.ListMyLearnSeedResult.ForEach(delegate(MSeed seedWork)
+                {
+                    lstMyMSeed.Add(seedWork);
+                });
+            }
+        }
+
+        //要素編集
+        private void btnEdit_Click(object sender, EventArgs e)
+        {
+            //選択チェック
+            if (lstvwMain.SelectedItems.Count == 0)
+            {
+                MessageBox.Show(XmlDatas.ListMessages["ERROR_1"]);
+                return;
+            }
+
+            List<MSeed> lstSelectedSeeds = new List<MSeed>();
+            MSeed seedCelected = new MSeed(lstMSeed[lstvwMain.SelectedItems[0].Index]);
+            for (int i = 0; i < lstvwMain.SelectedItems.Count; i++)
+            {
+                lstSelectedSeeds.Add(lstMSeed[lstvwMain.SelectedItems[i].Index]);
+            }
+
+            //編集画面の表示
+            frmEditSeed frmEdit = new frmEditSeed();
+            frmEdit.ListHinshi = lstHinshi;
+            frmEdit.ListHinshiSub1 = lstHinshiSub1;
+            frmEdit.ListHinshiSub2 = lstHinshiSub2;
+            frmEdit.ListHinshiSub3 = lstHinshiSub3;
+            frmEdit.ListKatsuyo1 = lstKatsuyo1;
+            frmEdit.ListKatsuyo2 = lstKatsuyo2;
+            frmEdit.systemInfo = systemInfo;
+            frmEdit.ListMyLearnSeed = lstMyMSeed;
+            frmEdit.MySeedInfo = seedCelected;
+            frmEdit.ProcessMode = 0;
+            frmEdit.EditMode = 1;
+            frmEdit.ShowDialog();
+
+            if (frmEdit.ReturnValue == 1)
+            {
+                seedCelected = frmEdit.MySeedInfoResult;
+
+                //先ず先頭の要素を置換する
+                int intInsertIndex = lstvwMain.SelectedItems[0].Index;
+                for (int i = 0; i < lstvwMain.SelectedItems.Count; i++)
+                {
+                    lstMSeed.RemoveAt(intInsertIndex);
+                }
+                lstMSeed.Insert(intInsertIndex, seedCelected);
+
+                //次に、同様に置換対象となる要素を洗い出す
+                List<int> lstIndexes = new List<int>();
+                int intIndexWork = 0;
+                while (intIndexWork < lstMSeed.Count)
+                {
+                    intIndexWork = lstMSeed.FindIndex(intIndexWork, delegate(MSeed mSeedMatch)
+                    {
+                        if (mSeedMatch.DictionaryMembers["HYOSO_TYPE"].ToString().Equals(lstSelectedSeeds[0].DictionaryMembers["HYOSO_TYPE"].ToString()) && mSeedMatch.DictionaryMembers["HINSHI"].ToString().Equals(lstSelectedSeeds[0].DictionaryMembers["HINSHI"].ToString()))
+                            return true;
+                        else
+                            return false;
+                    });
+
+                    if (intIndexWork > 0)
+                    {
+                        intIndexWork++;
+                        int intCountWork = 1;
+                        int intEnd = intIndexWork + lstSelectedSeeds.Count - 1;
+                        Boolean bHitWork = true;
+
+                        for (int i = intIndexWork; i < intEnd; i++)
+                        {
+                            if (!lstMSeed[i].DictionaryMembers["HYOSO_TYPE"].ToString().Equals(lstSelectedSeeds[intCountWork].DictionaryMembers["HYOSO_TYPE"].ToString()) || !lstMSeed[i].DictionaryMembers["HINSHI"].ToString().Equals(lstSelectedSeeds[intCountWork].DictionaryMembers["HINSHI"].ToString()))
+                                bHitWork = false;
+
+                            intCountWork++;
+                        }
+
+                        if (bHitWork)
+                        {
+                            lstIndexes.Add(intIndexWork);
+                            intIndexWork += lstSelectedSeeds.Count;
+                        }
+                    }
+                    else
+                        break;
+
+                    
+                }
+
+                if (lstIndexes.Count > 0)
+                {
+                    String strMessageConfirm = String.Format(XmlDatas.ListMessages["CONFIRM_3"], lstIndexes.Count.ToString());
+                    if (MessageBox.Show(strMessageConfirm, XmlDatas.ListNames["CONFIRM"], MessageBoxButtons.YesNo) == System.Windows.Forms.DialogResult.Yes)
+                    {
+                        intIndexWork = 0;
+                        while (intIndexWork < lstMSeed.Count)
+                        {
+                            intIndexWork = lstMSeed.FindIndex(intIndexWork, delegate(MSeed mSeedMatch)
+                            {
+                                if (mSeedMatch.DictionaryMembers["HYOSO_TYPE"].ToString().Equals(lstSelectedSeeds[0].DictionaryMembers["HYOSO_TYPE"].ToString()) && mSeedMatch.DictionaryMembers["HINSHI"].ToString().Equals(lstSelectedSeeds[0].DictionaryMembers["HINSHI"].ToString()))
+                                    return true;
+                                else
+                                    return false;
+                            });
+
+                            if (intIndexWork > 0)
+                            {
+                                int intStartWork = intIndexWork;
+                                intIndexWork++;
+                                int intCountWork = 1;
+                                int intEnd = intIndexWork + lstSelectedSeeds.Count - 1;
+                                Boolean bHitWork = true;
+
+                                for (int i = intIndexWork; i < intEnd; i++)
+                                {
+                                    if (!lstMSeed[i].DictionaryMembers["HYOSO_TYPE"].ToString().Equals(lstSelectedSeeds[intCountWork].DictionaryMembers["HYOSO_TYPE"].ToString()) || !lstMSeed[i].DictionaryMembers["HINSHI"].ToString().Equals(lstSelectedSeeds[intCountWork].DictionaryMembers["HINSHI"].ToString()))
+                                        bHitWork = false;
+
+                                    intCountWork++;
+                                }
+
+                                if (bHitWork)
+                                {
+                                    for (int i = intStartWork; i < intEnd; i++)
+                                    {
+                                        lstMSeed.RemoveAt(intStartWork);
+                                    }
+
+                                    lstMSeed.Insert(intStartWork, seedCelected);
+
+                                    intIndexWork += lstSelectedSeeds.Count;
+                                }
+                            }
+                            else
+                                break;
+                        }
+                    }
+                }
+
+                if (!setMainListView(0))
+                    return;
+
+                lstvwMain.SelectedIndices.Clear();
+                lstvwMain.Items[intInsertIndex].Selected = true;
+                lstvwMain.Select();
+                lstvwMain.Items[intInsertIndex].Focused = true; 
+            }
+        }
+
+        //要素削除
+        private void btnDel_Click(object sender, EventArgs e)
+        {
+            //選択チェック
+            if (lstvwMain.SelectedItems.Count == 0)
+            {
+                MessageBox.Show(XmlDatas.ListMessages["ERROR_1"]);
+                return;
+            }
+
+            if (MessageBox.Show(XmlDatas.ListMessages["CONFIRM_1"], XmlDatas.ListNames["CONFIRM"], MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                int intSelectedCount = lstvwMain.SelectedIndices.Count;
+                for (int i = intSelectedCount - 1; i >= 0; i--)
+                {
+                    int intSelectedIndex = lstvwMain.SelectedIndices[i];
+                    lstMSeed.RemoveAt(intSelectedIndex);
+                    lstvwMain.Items.RemoveAt(intSelectedIndex);
+                }
+            }
+        }
+
+        //getter, setter
+        public List<MSeed> ListAllMSeed
+        {
+            get { return lstAllMSeed; }
+            set { lstAllMSeed = value; }
+        }
+
+        public List<MSeed> ListMyMSeed
+        {
+            get { return lstMyMSeed; }
+            set { lstMyMSeed = value; }
+        }
+
+        //プログラムの終了
+        private void 終了XToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        //システム情報の設定
+        private void システム設定TToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            frmSetSystemInfo frmSetSysInfo = new frmSetSystemInfo();
+            frmSetSysInfo.mySystemInfo = systemInfo;
+            frmSetSysInfo.ShowDialog();
+        }
+
+        //CSV情報の設定
+        private void cSV設定GToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //保存ボタンクリック時(品詞、CSV、コーパスを全て保存)
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            //コーパスの保存
+            if (outputCopusFile())
+            {
+            }
+
+            //Csvファイルの保存
+            if (outputCsvFile())
+            {
+            }
+        }
+
+        private void 上書き保存SToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //コーパスの保存
+            if (outputCopusFile(@strCoupusFilePath))
+            {
+            }
+
+            //Csvファイルの保存
+            if (outputCsvFile(@strCsvFilePath))
+            {
+            }
+        }
+
+        //リストを描画する
+        private Boolean setMainListView(int intEditModeWork)
+        {
+            Boolean bResult = false;
+
+            lstvwMain.Clear();
+            lstvwMain.Columns.Add(XmlDatas.ListNames["HYOSO_TYPE"]);
+            lstvwMain.Columns[0].Width = 200;
+            lstvwMain.Columns.Add(XmlDatas.ListNames["HINSHI"]);
+            lstvwMain.Columns.Add(XmlDatas.ListNames["HINSHI_DETAIL_1"]);
+            lstvwMain.Columns.Add(XmlDatas.ListNames["HINSHI_DETAIL_2"]);
+            lstvwMain.Columns.Add(XmlDatas.ListNames["HINSHI_DETAIL_3"]);
+
+            if (intEditModeWork == 0)
+            {
+                lstvwMain.Columns.Add(XmlDatas.ListNames["KATSUYO_KEI"]);
+                lstvwMain.Columns.Add(XmlDatas.ListNames["KATSUYO_TYPE"]);
+                lstvwMain.Columns.Add(XmlDatas.ListNames["BASE_TYPE"]);
+                lstvwMain.Columns[7].Width = 200;
+                lstvwMain.Columns.Add(XmlDatas.ListNames["YOMI"]);
+                lstvwMain.Columns[8].Width = 200;
+                lstvwMain.Columns.Add(XmlDatas.ListNames["HATSUON"]);
+                lstvwMain.Columns[9].Width = 200;
+            }
+            else
+            {
+                lstvwMain.Columns.Add(XmlDatas.ListNames["DATA_COUNT"]);
+            }
+
+            lstMSeed.ForEach(delegate(MSeed mSeedWork)
+            {
+                if (intEditModeWork == 0)
+                {
+                    String[] strLineWork = { mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HYOSO_TYPE"]].ToString(), mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString(), mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]].ToString(), mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]].ToString(), mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]].ToString(), mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_KEI"]].ToString(), mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_TYPE"]].ToString(), mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["BASE_TYPE"]].ToString(), mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["YOMI"]].ToString(), mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HATSUON"]].ToString() };
+                    lstvwMain.Items.Add(new ListViewItem(strLineWork));
+                }
+                else
+                {
+                    String[] strLineWork = { mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HYOSO_TYPE"]].ToString(), mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString(), mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]].ToString(), mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]].ToString(), mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]].ToString(), mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["DATA_COUNT"]].ToString() };
+                    lstvwMain.Items.Add(new ListViewItem(strLineWork));
+                }
+            });
+
+            lblCopusInfo.Text = XmlDatas.ListNames["COPUS_NUMBER"] + ":" + lstMSeed.Count.ToString();
+            bResult = true;
+
+            return bResult;
+        }
+
+        //EOS除去
+        private void btnEos_Click(object sender, EventArgs e)
+        {
+            lstMSeed.RemoveAll(delegate(MSeed seedWork)
+            {
+                if (seedWork.DictionaryMembers["HYOSO_TYPE"].Equals("EOS") && seedWork.DictionaryMembers["HINSHI"].Equals(String.Empty))
+                    return true;
+                else
+                    return false;
+            });
+
+            if (!setMainListView(0))
+                return;
+        }
+
+        //置換情報設定
+        private void 置換情報設定WToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            frmMorphemeReplaceInfo frmMorphemeRepInfo = new frmMorphemeReplaceInfo();
+            frmMorphemeRepInfo.ListHinshi = lstHinshi;
+            frmMorphemeRepInfo.ListHinshiSub1 = lstHinshiSub1;
+            frmMorphemeRepInfo.ListHinshiSub2 = lstHinshiSub2;
+            frmMorphemeRepInfo.ListHinshiSub3 = lstHinshiSub3;
+            frmMorphemeRepInfo.ListKatsuyo1 = lstKatsuyo1;
+            frmMorphemeRepInfo.ListKatsuyo2 = lstKatsuyo2;
+            frmMorphemeRepInfo.ListMyLearnSeed = lstMyMSeed;
+            frmMorphemeRepInfo.ListMorphemeReplaceInfo = lstMorphemeReplaceInfo;
+            frmMorphemeRepInfo.ShowDialog();
+        }
+
+        //登録してある情報を基に一括置換
+        private void btnAllReplace_Click(object sender, EventArgs e)
+        {
+            int intCurrent = 0;
+            int intSourceMax = 0;
+            int intMaX = lstMSeed.Count;
+            
+            foreach (MorphemeReplaceInfo morphemeReplaceInfoEach in lstMorphemeReplaceInfo)
+            {
+                List<MSeed> lstSelectedSeeds = new List<MSeed>();
+                MSeed seedCelected = new MSeed();
+
+
+                //当たり判定
+                Boolean bHit = false;
+                int intCheckCount = 0;
+                intCurrent = 0;
+
+                while (intCurrent < lstMSeed.Count)
+                {
+                    intCheckCount = 0;
+                    intSourceMax = intCurrent + morphemeReplaceInfoEach.ListSourceCount;
+                    lstSelectedSeeds.Clear();
+                    seedCelected = new MSeed();
+
+                    for (int i = intCurrent; i < intSourceMax; i++)
+                    {
+                        bHit = false;
+
+                        if (!morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["HYOSO_TYPE"].Equals(String.Empty))
+                        {
+                            if (lstMSeed[i].DictionaryMembers["HYOSO_TYPE"].Equals(morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["HYOSO_TYPE"]))
+                            {
+                                bHit = true;
+                            }
+                            else
+                            {
+                                bHit = false;
+                                break;
+                            }
+                        }
+
+                        if (!morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["HINSHI"].Equals(String.Empty))
+                        {
+                            if (lstMSeed[i].DictionaryMembers["HINSHI"].Equals(morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["HINSHI"]))
+                            {
+                                bHit = true;
+                            }
+                            else
+                            {
+                                bHit = false;
+                                break;
+                            }
+                        }
+
+                        if (!morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["HINSHI_DETAIL_1"].Equals(String.Empty))
+                        {
+                            if (lstMSeed[i].DictionaryMembers["HINSHI_DETAIL_1"].Equals(morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["HINSHI_DETAIL_1"]))
+                            {
+                                bHit = true;
+                            }
+                            else
+                            {
+                                bHit = false;
+                                break;
+                            }
+                        }
+
+                        if (!morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["HINSHI_DETAIL_2"].Equals(String.Empty))
+                        {
+                            if (lstMSeed[i].DictionaryMembers["HINSHI_DETAIL_2"].Equals(morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["HINSHI_DETAIL_2"]))
+                            {
+                                bHit = true;
+                            }
+                            else
+                            {
+                                bHit = false;
+                                break;
+                            }
+                        }
+
+                        if (!morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["HINSHI_DETAIL_3"].Equals(String.Empty))
+                        {
+                            if (lstMSeed[i].DictionaryMembers["HINSHI_DETAIL_3"].Equals(morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["HINSHI_DETAIL_3"]))
+                            {
+                                bHit = true;
+                            }
+                            else
+                            {
+                                bHit = false;
+                                break;
+                            }
+                        }
+
+                        if (!morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["KATSUYO_KEI"].Equals(String.Empty))
+                        {
+                            if (lstMSeed[i].DictionaryMembers["KATSUYO_KEI"].Equals(morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["KATSUYO_KEI"]))
+                            {
+                                bHit = true;
+                            }
+                            else
+                            {
+                                bHit = false;
+                                break;
+                            }
+                        }
+
+                        if (!morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["KATSUYO_TYPE"].Equals(String.Empty))
+                        {
+                            if (lstMSeed[i].DictionaryMembers["KATSUYO_TYPE"].Equals(morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["KATSUYO_TYPE"]))
+                            {
+                                bHit = true;
+                            }
+                            else
+                            {
+                                bHit = false;
+                                break;
+                            }
+                        }
+
+                        intCheckCount++;
+
+                        if (!bHit)
+                            break;
+                    }
+
+                    if (bHit)
+                    {
+                        seedCelected.DictionaryMembers["HYOSO_TYPE"] = String.Empty;
+                        seedCelected.DictionaryMembers["HINSHI"] = "*";
+                        seedCelected.DictionaryMembers["HINSHI_DETAIL_1"] = "*";
+                        seedCelected.DictionaryMembers["HINSHI_DETAIL_2"] = "*";
+                        seedCelected.DictionaryMembers["HINSHI_DETAIL_3"] = "*";
+                        seedCelected.DictionaryMembers["KATSUYO_KEI"] = "*";
+                        seedCelected.DictionaryMembers["KATSUYO_TYPE"] = "*";
+                        seedCelected.DictionaryMembers["BASE_TYPE"] = String.Empty;
+                        seedCelected.DictionaryMembers["YOMI"] = String.Empty;
+                        seedCelected.DictionaryMembers["HATSUON"] = String.Empty;
+
+                        for (int i = intCurrent; i < intSourceMax; i++)
+                        {
+                            lstSelectedSeeds.Add(lstMSeed[i]);
+                            seedCelected.DictionaryMembers["HYOSO_TYPE"] += lstMSeed[i].DictionaryMembers["HYOSO_TYPE"].ToString();
+                            seedCelected.DictionaryMembers["BASE_TYPE"] += lstMSeed[i].DictionaryMembers["BASE_TYPE"].ToString();
+                            seedCelected.DictionaryMembers["YOMI"] += lstMSeed[i].DictionaryMembers["YOMI"].ToString();
+                            seedCelected.DictionaryMembers["HATSUON"] += lstMSeed[i].DictionaryMembers["HATSUON"].ToString();
+                        }
+
+                        if (morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["HINSHI"].ToString().Length > 0)
+                            seedCelected.DictionaryMembers["HINSHI"] = morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["HINSHI"].ToString();
+
+                        if (morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["HINSHI_DETAIL_1"].ToString().Length > 0)
+                            seedCelected.DictionaryMembers["HINSHI_DETAIL_1"] = morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["HINSHI_DETAIL_1"].ToString();
+
+                        if (morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["HINSHI_DETAIL_2"].ToString().Length > 0)
+                            seedCelected.DictionaryMembers["HINSHI_DETAIL_2"] = morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["HINSHI_DETAIL_2"].ToString();
+
+
+                        if (morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["HINSHI_DETAIL_3"].ToString().Length > 0)
+                            seedCelected.DictionaryMembers["HINSHI_DETAIL_3"] = morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["HINSHI_DETAIL_3"].ToString();
+
+                        if (morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["KATSUYO_KEI"].ToString().Length > 0)
+                            seedCelected.DictionaryMembers["KATSUYO_KEI"] = morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["KATSUYO_KEI"].ToString();
+
+                        if (morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["KATSUYO_TYPE"].ToString().Length > 0)
+                            seedCelected.DictionaryMembers["KATSUYO_TYPE"] = morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["KATSUYO_TYPE"].ToString();
+
+                        //編集画面の表示
+                        frmEditSeed frmEdit = new frmEditSeed();
+                        frmEdit.ListHinshi = lstHinshi;
+                        frmEdit.ListHinshiSub1 = lstHinshiSub1;
+                        frmEdit.ListHinshiSub2 = lstHinshiSub2;
+                        frmEdit.ListHinshiSub3 = lstHinshiSub3;
+                        frmEdit.ListKatsuyo1 = lstKatsuyo1;
+                        frmEdit.ListKatsuyo2 = lstKatsuyo2;
+                        frmEdit.systemInfo = systemInfo;
+                        frmEdit.ListMyLearnSeed = lstMyMSeed;
+                        frmEdit.MySeedInfo = seedCelected;
+                        frmEdit.ProcessMode = 0;
+                        frmEdit.EditMode = 1;
+                        frmEdit.ShowDialog();
+
+                        if (frmEdit.ReturnValue == 1)
+                        {
+                            seedCelected = frmEdit.MySeedInfoResult;
+
+                            //先ず先頭の要素を置換する
+                            for (int i = intCurrent; i < intSourceMax; i++)
+                            {
+                                lstMSeed.RemoveAt(intCurrent);
+                            }
+                            lstMSeed.Insert(intCurrent, seedCelected);
+
+                            //次に、同様に置換対象となる要素を洗い出す
+                            List<int> lstIndexes = new List<int>();
+                            int intIndexWork = 0;
+                            while (intIndexWork < lstMSeed.Count)
+                            {
+                                intIndexWork = lstMSeed.FindIndex(intIndexWork, delegate(MSeed mSeedMatch)
+                                {
+                                    if (mSeedMatch.DictionaryMembers["HYOSO_TYPE"].ToString().Equals(lstSelectedSeeds[0].DictionaryMembers["HYOSO_TYPE"].ToString()) && mSeedMatch.DictionaryMembers["HINSHI"].ToString().Equals(lstSelectedSeeds[0].DictionaryMembers["HINSHI"].ToString()))
+                                        return true;
+                                    else
+                                        return false;
+                                });
+
+                                if (intIndexWork > 0)
+                                {
+                                    intIndexWork++;
+                                    int intCountWork = 1;
+                                    int intEnd = intIndexWork + lstSelectedSeeds.Count - 1;
+                                    Boolean bHitWork = true;
+
+                                    for (int i = intIndexWork; i < intEnd; i++)
+                                    {
+                                        if (!lstMSeed[i].DictionaryMembers["HYOSO_TYPE"].ToString().Equals(lstSelectedSeeds[intCountWork].DictionaryMembers["HYOSO_TYPE"].ToString()) || !lstMSeed[i].DictionaryMembers["HINSHI"].ToString().Equals(lstSelectedSeeds[intCountWork].DictionaryMembers["HINSHI"].ToString()))
+                                            bHitWork = false;
+
+                                        intCountWork++;
+                                    }
+
+                                    if (bHitWork)
+                                    {
+                                        lstIndexes.Add(intIndexWork);
+                                        intIndexWork += lstSelectedSeeds.Count;
+                                    }
+                                }
+                                else
+                                    break;
+
+
+                            }
+
+                            if (lstIndexes.Count > 0)
+                            {
+                                String strMessageConfirm = String.Format(XmlDatas.ListMessages["CONFIRM_3"], lstIndexes.Count.ToString());
+                                if (MessageBox.Show(strMessageConfirm, XmlDatas.ListNames["CONFIRM"], MessageBoxButtons.YesNo) == System.Windows.Forms.DialogResult.Yes)
+                                {
+                                    intIndexWork = 0;
+                                    while (intIndexWork < lstMSeed.Count)
+                                    {
+                                        intIndexWork = lstMSeed.FindIndex(intIndexWork, delegate(MSeed mSeedMatch)
+                                        {
+                                            if (mSeedMatch.DictionaryMembers["HYOSO_TYPE"].ToString().Equals(lstSelectedSeeds[0].DictionaryMembers["HYOSO_TYPE"].ToString()) && mSeedMatch.DictionaryMembers["HINSHI"].ToString().Equals(lstSelectedSeeds[0].DictionaryMembers["HINSHI"].ToString()))
+                                                return true;
+                                            else
+                                                return false;
+                                        });
+
+                                        if (intIndexWork > 0)
+                                        {
+                                            int intStartWork = intIndexWork;
+                                            intIndexWork++;
+                                            int intCountWork = 1;
+                                            int intEnd = intIndexWork + lstSelectedSeeds.Count - 1;
+                                            Boolean bHitWork = true;
+
+                                            for (int i = intIndexWork; i < intEnd; i++)
+                                            {
+                                                if (!lstMSeed[i].DictionaryMembers["HYOSO_TYPE"].ToString().Equals(lstSelectedSeeds[intCountWork].DictionaryMembers["HYOSO_TYPE"].ToString()) || !lstMSeed[i].DictionaryMembers["HINSHI"].ToString().Equals(lstSelectedSeeds[intCountWork].DictionaryMembers["HINSHI"].ToString()))
+                                                    bHitWork = false;
+
+                                                intCountWork++;
+                                            }
+
+                                            if (bHitWork)
+                                            {
+                                                for (int i = intStartWork; i < intEnd; i++)
+                                                {
+                                                    lstMSeed.RemoveAt(intStartWork);
+                                                }
+
+                                                lstMSeed.Insert(intStartWork, seedCelected);
+
+                                                intIndexWork += lstSelectedSeeds.Count;
+                                            }
+                                        }
+                                        else
+                                            break;
+                                    }
+                                }
+                            }
+
+                            if (!setMainListView(0))
+                                return;
+
+                            intCurrent += morphemeReplaceInfoEach.ListSourceCount;
+                        }
+                        else if (frmEdit.ReturnValue == 2)
+                        {
+                            intCurrent = lstMSeed.Count;
+                            return;
+                        }
+                        else
+                        {
+                            intCurrent++;
+                        }
+                    }
+                    else
+                    {
+                        intCurrent++;
+                    }
+                }
+            }
+        }
+    }
+}

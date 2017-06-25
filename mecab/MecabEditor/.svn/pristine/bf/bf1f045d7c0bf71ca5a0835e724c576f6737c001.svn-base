@@ -1,0 +1,45 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml;
+
+namespace MecabEditor
+{
+    public static class XmlDatas
+    {
+        private static Dictionary<String, String> lstItemNames = new Dictionary<String, String>();
+        
+        static XmlDatas()
+        {
+            lstItemNames.Clear();
+
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(@"./xmls/ItemNames.xml");
+            
+            foreach (XmlNode xmlNodeWork in xmlDoc.ChildNodes)
+            {
+                if (xmlNodeWork.ChildNodes.Count > 0)
+                {
+                    foreach (XmlNode childNodeWork in xmlNodeWork.ChildNodes)
+                    {
+                        lstItemNames.Add(childNodeWork.InnerXml, childNodeWork.InnerText);
+                    }
+                }
+            }
+        }
+
+        //static XmlDatas()
+        //{
+            //XmlDatas myXmlDatas = new XmlDatas();
+        //}
+
+        public static Dictionary<String, String> ListItemNames
+        {
+            get { return lstItemNames; }
+            set { lstItemNames = value; }
+        }
+    }
+}

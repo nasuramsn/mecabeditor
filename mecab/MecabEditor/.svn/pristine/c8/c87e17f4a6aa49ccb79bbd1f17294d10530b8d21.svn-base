@@ -1,0 +1,53 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+using MySql.Data.MySqlClient;
+
+namespace MecabEditor
+{
+    //MySQLを管理するクラス
+    public class MySqlControl
+    {
+        //メンバ
+        private MySqlConnection conn;
+        private String strUser = String.Empty;
+        private String strPassword = String.Empty;
+        private String strDatabase = String.Empty;
+        private String strHost = String.Empty;
+
+        //コンストラクタ
+        public MySqlControl()
+        {
+        }
+
+        //接続
+        public Boolean connect(String user, String password, String database, String host)
+        {
+            Boolean bResult = false;
+            String strConnect = String.Empty;
+
+            try
+            {
+                strConnect = "userid=picklog; password=p!cklog; database = picklog_db; Host192.168.0.10"; 
+            }
+            catch (MySqlException mex)
+            {
+            }
+            catch (Exception ex)
+            {
+            }
+
+            return bResult;
+        }
+
+        //getter, setter
+        public MySqlConnection mysqlConn
+        {
+            get { return conn; }
+            set { conn = value; }
+        }
+    }
+}

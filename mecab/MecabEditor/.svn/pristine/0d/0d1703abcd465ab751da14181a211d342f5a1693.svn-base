@@ -1,0 +1,143 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace MecabEditor
+{
+    public partial class frmSetSystemInfo : Form
+    {
+        private SystemInfo systemInfo;
+
+
+        public frmSetSystemInfo()
+        {
+            InitializeComponent();
+        }
+
+        //Seedフォルダ設定ボタンクリック時
+        private void btnSeedFolderSet_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog fbdRead = new FolderBrowserDialog();
+            //fbdRead.Description = "ファイルを指定してください";
+            fbdRead.Description = String.Format(XmlDatas.ListMessages["CONFIRM_2"].ToString(), XmlDatas.ListNames["FOLDER"].ToString());
+            if (fbdRead.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                String strDirectoryName = fbdRead.SelectedPath;
+                if (!System.IO.Directory.Exists(@strDirectoryName))
+                {
+                    MessageBox.Show(String.Format(XmlDatas.ListMessages["ERROR_2"].ToString(), XmlDatas.ListNames["FOLDER"].ToString()));
+                    return;
+                }
+
+                txtSeedFolder.Text = strDirectoryName;
+            }
+        }
+
+        //設定ボタンクリック時
+        private void btnSet_Click(object sender, EventArgs e)
+        {
+            String strFileName = XmlDatas.ListConsts["SETTING_INI_FILE_PATH"].ToString();
+            StreamWriter strwtr = null;
+
+            if (!inputCheck())
+                return;
+
+            systemInfo.ListMembers[XmlDatas.ListConsts["SEED_DIRECTORY_PATH"]] = txtSeedFolder.Text;
+            systemInfo.ListMembers[XmlDatas.ListConsts["CSV_DIRECTORY_PATH"]] = txtCsvFolder.Text;
+
+            try
+            {
+                strwtr = new StreamWriter(strFileName, false, Encoding.GetEncoding("utf-8"));
+                strwtr.WriteLine(XmlDatas.ListConsts["SEED_DIRECTORY_PATH_HEADER"].ToString() + systemInfo.ListMembers[XmlDatas.ListConsts["SEED_DIRECTORY_PATH"]].ToString());
+                strwtr.WriteLine(XmlDatas.ListConsts["CSV_DIRECTORY_PATH_HEADER"].ToString() + systemInfo.ListMembers[XmlDatas.ListConsts["CSV_DIRECTORY_PATH"]].ToString());
+            }
+            catch (IOException ioe)
+            {
+                MessageBox.Show(ioe.Message);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                if (strwtr != null)
+                {
+                    strwtr.Close();
+                    strwtr.Dispose();
+                }
+            }
+
+            Close();
+        }
+
+        //閉じるボタンクリック時
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        //入力チェック
+        private Boolean inputCheck()
+        {
+            Boolean bResult = true;
+            List<String> lstMessages = new List<String>();
+
+            txtSeedFolder.BackColor = XmlDatas.ListColors["NORMAL_TEXT"];
+
+            if (txtSeedFolder.Text.Length == 0)
+            {
+                lstMessages.Add(String.Format(XmlDatas.ListMessages["ERROR_3"].ToString(), XmlDatas.ListNames["FOLDER"].ToString()));
+                txtSeedFolder.BackColor = XmlDatas.ListColors["ERROR_TEXT"];
+                bResult = false;
+            }
+
+            if (txtCsvFolder.Text.Length == 0)
+            {
+                lstMessages.Add(String.Format(XmlDatas.ListMessages["ERROR_3"].ToString(), XmlDatas.ListNames["FOLDER"].ToString()));
+                txtCsvFolder.BackColor = XmlDatas.ListColors["ERROR_TEXT"];
+                bResult = false;
+            }
+
+            if (!bResult)
+            {
+                String strMessage = String.Empty;
+
+                lstMessages.ForEach(delegate(String strMessageWork)
+                {
+                    strMessage = strMessage + strMessageWork + "\n";
+                });
+                MessageBox.Show(strMessage);
+            }
+
+            return bResult;
+        }
+
+        private void frmSetSystemInfo_Shown(object sender, EventArgs e)
+        {
+            //システム設定情報ファイルパス
+            if (systemInfo.ListMembers.ContainsKey(XmlDatas.ListConsts["SEED_DIRECTORY_PATH"]))
+            {
+                if (systemInfo.ListMembers[XmlDatas.ListConsts["SEED_DIRECTORY_PATH"]].ToString().Length > 0)
+                    txtSeedFolder.Text = systemInfo.ListMembers[XmlDatas.ListConsts["SEED_DIRECTORY_PATH"]].ToString();
+
+                if (systemInfo.ListMembers[XmlDatas.ListConsts["CSV_DIRECTORY_PATH"]].ToString().Length > 0)
+                    txtCsvFolder.Text = systemInfo.ListMembers[XmlDatas.ListConsts["CSV_DIRECTORY_PATH"]].ToString();
+            }
+        }
+
+        //getter, setter
+        public SystemInfo mySystemInfo
+        {
+            get { return systemInfo; }
+            set { systemInfo = value; }
+        }
+    }
+}

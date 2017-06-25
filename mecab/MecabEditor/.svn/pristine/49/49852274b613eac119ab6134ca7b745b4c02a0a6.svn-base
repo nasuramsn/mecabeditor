@@ -1,0 +1,195 @@
+﻿namespace MecabEditor
+{
+    partial class frmMain
+    {
+        /// <summary>
+        /// 必要なデザイナー変数です。
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// 使用中のリソースをすべてクリーンアップします。
+        /// </summary>
+        /// <param name="disposing">マネージ リソースが破棄される場合 true、破棄されない場合は false です。</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows フォーム デザイナーで生成されたコード
+
+        /// <summary>
+        /// デザイナー サポートに必要なメソッドです。このメソッドの内容を
+        /// コード エディターで変更しないでください。
+        /// </summary>
+        private void InitializeComponent()
+        {
+            this.btnFile = new System.Windows.Forms.Button();
+            this.btnClose = new System.Windows.Forms.Button();
+            this.lblReadFile = new System.Windows.Forms.Label();
+            this.lstvwMain = new System.Windows.Forms.ListView();
+            this.cmbEditMode = new System.Windows.Forms.ComboBox();
+            this.btnFileOutput = new System.Windows.Forms.Button();
+            this.lblFilePath = new System.Windows.Forms.Label();
+            this.btnDel = new System.Windows.Forms.Button();
+            this.btnEdit = new System.Windows.Forms.Button();
+            this.btnAdd = new System.Windows.Forms.Button();
+            this.SuspendLayout();
+            // 
+            // btnFile
+            // 
+            this.btnFile.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnFile.Location = new System.Drawing.Point(351, 548);
+            this.btnFile.Name = "btnFile";
+            this.btnFile.Size = new System.Drawing.Size(98, 23);
+            this.btnFile.TabIndex = 20;
+            this.btnFile.Text = "ファイル読取り";
+            this.btnFile.UseVisualStyleBackColor = true;
+            this.btnFile.Click += new System.EventHandler(this.btnFile_Click);
+            // 
+            // btnClose
+            // 
+            this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnClose.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnClose.Location = new System.Drawing.Point(1096, 547);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(75, 23);
+            this.btnClose.TabIndex = 90;
+            this.btnClose.Text = "閉じる";
+            this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            // 
+            // lblReadFile
+            // 
+            this.lblReadFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblReadFile.AutoSize = true;
+            this.lblReadFile.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblReadFile.Location = new System.Drawing.Point(13, 547);
+            this.lblReadFile.Name = "lblReadFile";
+            this.lblReadFile.Size = new System.Drawing.Size(72, 14);
+            this.lblReadFile.TabIndex = 10;
+            this.lblReadFile.Text = "読取り対象";
+            // 
+            // lstvwMain
+            // 
+            this.lstvwMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lstvwMain.FullRowSelect = true;
+            this.lstvwMain.Location = new System.Drawing.Point(12, 12);
+            this.lstvwMain.Name = "lstvwMain";
+            this.lstvwMain.Size = new System.Drawing.Size(1159, 497);
+            this.lstvwMain.TabIndex = 1;
+            this.lstvwMain.UseCompatibleStateImageBehavior = false;
+            this.lstvwMain.View = System.Windows.Forms.View.Details;
+            // 
+            // cmbEditMode
+            // 
+            this.cmbEditMode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmbEditMode.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.cmbEditMode.FormattingEnabled = true;
+            this.cmbEditMode.Location = new System.Drawing.Point(488, 550);
+            this.cmbEditMode.Name = "cmbEditMode";
+            this.cmbEditMode.Size = new System.Drawing.Size(121, 21);
+            this.cmbEditMode.TabIndex = 21;
+            this.cmbEditMode.SelectedIndexChanged += new System.EventHandler(this.cmbEditMode_SelectedIndexChanged);
+            // 
+            // btnFileOutput
+            // 
+            this.btnFileOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnFileOutput.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnFileOutput.Location = new System.Drawing.Point(615, 550);
+            this.btnFileOutput.Name = "btnFileOutput";
+            this.btnFileOutput.Size = new System.Drawing.Size(98, 23);
+            this.btnFileOutput.TabIndex = 22;
+            this.btnFileOutput.Text = "ファイル出力";
+            this.btnFileOutput.UseVisualStyleBackColor = true;
+            this.btnFileOutput.Click += new System.EventHandler(this.btnFileOutput_Click);
+            // 
+            // lblFilePath
+            // 
+            this.lblFilePath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblFilePath.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblFilePath.Location = new System.Drawing.Point(104, 547);
+            this.lblFilePath.Name = "lblFilePath";
+            this.lblFilePath.Size = new System.Drawing.Size(225, 14);
+            this.lblFilePath.TabIndex = 11;
+            // 
+            // btnDel
+            // 
+            this.btnDel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnDel.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnDel.Location = new System.Drawing.Point(200, 515);
+            this.btnDel.Name = "btnDel";
+            this.btnDel.Size = new System.Drawing.Size(75, 23);
+            this.btnDel.TabIndex = 4;
+            this.btnDel.Text = "削除";
+            this.btnDel.UseVisualStyleBackColor = true;
+            this.btnDel.Click += new System.EventHandler(this.btnDel_Click);
+            // 
+            // btnEdit
+            // 
+            this.btnEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnEdit.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnEdit.Location = new System.Drawing.Point(107, 515);
+            this.btnEdit.Name = "btnEdit";
+            this.btnEdit.Size = new System.Drawing.Size(75, 23);
+            this.btnEdit.TabIndex = 3;
+            this.btnEdit.Text = "編集";
+            this.btnEdit.UseVisualStyleBackColor = true;
+            this.btnEdit.Click += new System.EventHandler(this.btnEdit_Click);
+            // 
+            // btnAdd
+            // 
+            this.btnAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnAdd.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.btnAdd.Location = new System.Drawing.Point(16, 515);
+            this.btnAdd.Name = "btnAdd";
+            this.btnAdd.Size = new System.Drawing.Size(75, 23);
+            this.btnAdd.TabIndex = 2;
+            this.btnAdd.Text = "追加";
+            this.btnAdd.UseVisualStyleBackColor = true;
+            this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
+            // 
+            // frmMain
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(1183, 582);
+            this.Controls.Add(this.btnDel);
+            this.Controls.Add(this.btnEdit);
+            this.Controls.Add(this.btnAdd);
+            this.Controls.Add(this.lblFilePath);
+            this.Controls.Add(this.btnFileOutput);
+            this.Controls.Add(this.cmbEditMode);
+            this.Controls.Add(this.lstvwMain);
+            this.Controls.Add(this.lblReadFile);
+            this.Controls.Add(this.btnClose);
+            this.Controls.Add(this.btnFile);
+            this.Name = "frmMain";
+            this.Text = "コーパス編集";
+            this.Shown += new System.EventHandler(this.frmMain_Shown);
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
+        }
+
+        #endregion
+
+        private System.Windows.Forms.Button btnFile;
+        private System.Windows.Forms.Button btnClose;
+        private System.Windows.Forms.Label lblReadFile;
+        private System.Windows.Forms.ListView lstvwMain;
+        private System.Windows.Forms.ComboBox cmbEditMode;
+        private System.Windows.Forms.Button btnFileOutput;
+        private System.Windows.Forms.Label lblFilePath;
+        private System.Windows.Forms.Button btnDel;
+        private System.Windows.Forms.Button btnEdit;
+        private System.Windows.Forms.Button btnAdd;
+    }
+}
+

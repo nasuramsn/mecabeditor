@@ -1,0 +1,84 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace MecabEditor
+{
+    //色々な用途に使う関数
+    static public class MyUtils
+    {
+        //コンストラクタ
+        static MyUtils()
+        {
+        }
+
+        //sjisからutf8に変更
+        static public String changeSjisToUtf8(String strSource)
+        {
+            String strResult = String.Empty;
+            byte[] byteDatas;
+
+            byteDatas = System.Text.Encoding.GetEncoding(932).GetBytes(strSource);
+            strResult = System.Text.Encoding.UTF8.GetString(byteDatas);
+
+            return strResult;
+        }
+
+        //Csvファイル出力
+        static public Boolean outputCsvFile(String strFileName, List<MSeed> lstMyMSeed)
+        {
+            Boolean bResult = false;
+            StreamWriter strwtr = null;
+
+            try
+            {
+                strwtr = new StreamWriter(@strFileName, false, Encoding.UTF8);
+
+                lstMyMSeed.ForEach(delegate(MSeed mSeedWork)
+                {
+                    String strOutputWork = mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HYOSO_TYPE"]].ToString();
+                    Debug.WriteLine(strOutputWork);
+                    if (!mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString().Equals(String.Empty))
+                    {
+                        strOutputWork = strOutputWork + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["LEFT_CONNECT_STATUS_NO"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["RIGHT_CONNECT_STATUS_NO"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["COST"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_KEI"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_TYPE"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["BASE_TYPE"]].ToString();
+                    }
+
+                    if (!mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["YOMI"]].ToString().Equals(String.Empty))
+                    {
+                        strOutputWork = strOutputWork + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["YOMI"]].ToString() + "," + mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HATSUON"]].ToString();
+                    }
+
+                    strwtr.WriteLine(strOutputWork);
+                });
+
+                MessageBox.Show(String.Format(XmlDatas.ListMessages["INFORMATION_1"], XmlDatas.ListNames["CSV_FILE_LEARN"]));
+
+
+                bResult = true;
+            }
+            catch (IOException ioe)
+            {
+                MessageBox.Show(ioe.Message);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                if (strwtr != null)
+                {
+                    strwtr.Close();
+                    strwtr.Dispose();
+                }
+            }
+
+            return bResult;
+        }
+    }
+}

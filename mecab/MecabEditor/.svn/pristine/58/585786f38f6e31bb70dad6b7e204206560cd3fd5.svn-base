@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Messages>
+  <CONFIRM_1>データを削除します。よろしいですか？</CONFIRM_1>
+  <ERROR_1>データが選択されていません。</ERROR_1>
+  <INFORMATION_1>{0}を出力しました。</INFORMATION_1>
+</Messages>

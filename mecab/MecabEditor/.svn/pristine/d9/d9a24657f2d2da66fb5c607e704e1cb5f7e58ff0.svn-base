@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<ItemNames>
+  <ItemName id="BASE_TYPE">BASE_TYPE</ItemName>
+  <ItemName id="CREATED_AT">CREATED_AT</ItemName>
+  <ItemName id="DATA_COUNT">DATA_COUNT</ItemName>
+  <ItemName id="DELETE_FLAG">DELETE_FLAG</ItemName>
+  <ItemName id="HATSUON">HATSUON</ItemName>
+  <ItemName id="HINSHI_BASIC">HINSHI_BASIC</ItemName>
+  <ItemName id="HINSHI">HINSHI</ItemName>
+  <ItemName id="HINSHI_NO">HINSHI_NO</ItemName>
+  <ItemName id="HINSHI_DETAIL_1">HINSHI_DETAIL_1</ItemName>
+  <ItemName id="HINSHI_DETAIL_2">HINSHI_DETAIL_2</ItemName>
+  <ItemName id="HINSHI_DETAIL_3">HINSHI_DETAIL_3</ItemName>
+  <ItemName id="HYOSO_TYPE">HYOSO_TYPE</ItemName>
+  <ItemName id="KATSUYO_KEI">KATSUYO_KEI</ItemName>
+  <ItemName id="KATSUYO_TYPE">KATSUYO_TYPE</ItemName>
+  <ItemName id="LEFT_CONNECT_STATUS_NO">LEFT_CONNECT_STATUS_NO</ItemName>
+  <ItemName id="PARENT_HINSHI_NO">PARENT_HINSHI_NO</ItemName>
+  <ItemName id="RIGHT_CONNECT_STATUS_NO">RIGHT_CONNECT_STATUS_NO</ItemName>
+  <ItemName id="SEED_NO">SEED_NO</ItemName>
+  <ItemName id="UPDATED_AT">UPDATED_AT</ItemName>
+  <ItemName id="YOMI">YOMI</ItemName>
+</ItemNames>

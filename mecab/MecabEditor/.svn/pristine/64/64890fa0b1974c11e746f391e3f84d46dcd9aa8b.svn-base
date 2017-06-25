@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<Colors>
+  <ERROR_TEXT>255,128,128</ERROR_TEXT>
+  <NORMAL_TEXT>255,255,255</NORMAL_TEXT>
+</Colors>
