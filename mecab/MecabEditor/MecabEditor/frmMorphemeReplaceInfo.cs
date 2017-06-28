@@ -54,7 +54,16 @@ namespace MecabEditor
             {
                 lstMorphemeReplaceSource.Add(frmEdit.MySeedInfoResult);
                 String[] strLineList = { frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["HYOSO_TYPE"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_KEI"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_TYPE"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["BASE_TYPE"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["YOMI"]].ToString(), frmEdit.MySeedInfoResult.DictionaryMembers[XmlDatas.ListItemNames["HATSUON"]].ToString() };
+                lstvwMorpemeReplaceInfoSource.BeginUpdate();
                 lstvwMorpemeReplaceInfoSource.Items.Add(new ListViewItem(strLineList));
+                lstvwMorpemeReplaceInfoSource.EndUpdate();
+
+                lstHinshi = frmEdit.ListHinshi;
+                lstHinshiSub1 = frmEdit.ListHinshiSub1;
+                lstHinshiSub2 = frmEdit.ListHinshiSub2;
+                lstHinshiSub3 = frmEdit.ListHinshiSub3;
+                lstKatsuyo1 = frmEdit.ListKatsuyo1;
+                lstKatsuyo2 = frmEdit.ListKatsuyo2;
             }
 
             frmEdit.Close();
@@ -464,11 +473,10 @@ namespace MecabEditor
         //決定
         private void btnTake_Click(object sender, EventArgs e)
         {
+            String strMsg = "";
+
             if (inputCheck())
             {
-                //追加の時
-                //if (intEditMode == 0)
-                //{
                 MorphemeReplaceInfo morhpemeReplaceInfo = new MorphemeReplaceInfo();
                 morhpemeReplaceInfo.MorphemeReplaceInfoName = txtName.Text;
                 morhpemeReplaceInfo.ListSourceCount = lstMorphemeReplaceSource.Count;
@@ -533,6 +541,7 @@ namespace MecabEditor
                 {
                     lstMorphemeReplaceInfo.Add(morhpemeReplaceInfo);
                     lstvwMorphemeReplaceInfo.Items.Add(morhpemeReplaceInfo.MorphemeReplaceInfoName);
+                    strMsg = "追加";
                 }
                 //編集の時
                 else if (intEditMode == 1)
@@ -552,7 +561,23 @@ namespace MecabEditor
                     }
                     lstMorphemeReplaceInfo[intSelectedWork].ListDestinationCount = morhpemeReplaceInfo.ListDestinationCount;
                     lstMorphemeReplaceInfo[intSelectedWork].ListDestination = new List<MSeed>(morhpemeReplaceInfo.ListDestination);
+                    lstvwMorphemeReplaceInfo.Items[intSelectedWork].Text = morhpemeReplaceInfo.MorphemeReplaceInfoName;
+                    strMsg = "編集";
                 }
+
+                //完了のメッセ―ジ
+                MessageBox.Show(String.Format(XmlDatas.ListMessages["INFORMATION_FINISHED"], strMsg));
+                lstMorphemeReplaceSource.Clear();
+                lstMorphemeReplaceDestination.Clear();
+                lstvwMorpemeReplaceInfoSource.Items.Clear();
+                lstvwMorpemeReplaceInfoDestination.Items.Clear();
+                txtName.Text = "";
+                txtHyosoIndex.Text = "";
+                chkAuto.Checked = false;
+                chkHyoso.Checked = false;
+                chkLoop.Checked = false;
+                lblReadFile.Text = "";
+                controlButtons(0);
             }
         }
 
@@ -679,6 +704,7 @@ namespace MecabEditor
             lstMorphemeReplaceInfo.Insert(intSelectedIndex, temp3);
 
             lstvwMorphemeReplaceInfo.SelectedItems.Clear();
+            lstvwMorphemeReplaceInfo.Items[intSelectedIndex - 1].Selected = true;
         }
 
         
@@ -711,6 +737,7 @@ namespace MecabEditor
             lstMorphemeReplaceSource.Insert(intSelectedIndex, temp3);
 
             lstvwMorpemeReplaceInfoSource.SelectedItems.Clear();
+            lstvwMorphemeReplaceInfo.Items[intSelectedIndex + 1].Selected = true;
         }
 
         //選択された置換情報の優先順位を上げる
@@ -742,6 +769,7 @@ namespace MecabEditor
             lstMorphemeReplaceSource.Insert(intSelectedIndex, temp3);
 
             lstvwMorpemeReplaceInfoSource.SelectedItems.Clear();
+            lstvwMorphemeReplaceInfo.Items[intSelectedIndex - 1].Selected = true;
         }
 
         //選択された置換情報の優先順位を下げる
@@ -773,6 +801,7 @@ namespace MecabEditor
             lstMorphemeReplaceInfo.Insert(intSelectedIndex, temp3);
 
             lstvwMorphemeReplaceInfo.SelectedItems.Clear();
+            lstvwMorphemeReplaceInfo.Items[intSelectedIndex + 1].Selected = true;
         }
 
         //表層系をファイル指定するかどうかのチェックボックス

@@ -189,6 +189,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lstvwMorphemeReplaceInfo.FullRowSelect = true;
+            this.lstvwMorphemeReplaceInfo.HideSelection = false;
             this.lstvwMorphemeReplaceInfo.Location = new System.Drawing.Point(663, 35);
             this.lstvwMorphemeReplaceInfo.Name = "lstvwMorphemeReplaceInfo";
             this.lstvwMorphemeReplaceInfo.Size = new System.Drawing.Size(370, 341);

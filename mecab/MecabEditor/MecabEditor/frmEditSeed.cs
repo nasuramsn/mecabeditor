@@ -16,7 +16,6 @@ namespace MecabEditor
     public partial class frmEditSeed : Form
     {
         //メンバ
-        //private SeedInfo mySeedInfo = new SeedInfo();
         private MSeed mySeedInfo = new MSeed();
         private MSeed mySeedInfoResult = new MSeed();
         private Dictionary<String, Boolean> dicIsEdited = new Dictionary<String, Boolean>();
@@ -118,113 +117,8 @@ namespace MecabEditor
 
             try
             {
-                //品詞
-                lstHinshi.ForEach(delegate(MHinshi mHinshiWork)
-                {
-                    if (mHinshiWork.CreatedAt.Equals(new DateTime(0)) && mHinshiWork.UpdatedAt.Equals(new DateTime(0)))
-                    {
-                        if (mySqlControl.insert("insert into M_HINSHI values (" + mHinshiWork.Id + ", '" + mHinshiWork.Name + "', "
-                            + mHinshiWork.Level + ", " + mHinshiWork.ParentId + ", Now(), Now(), " + mHinshiWork.DeleteFlg + ")"))
-                        {
-                            DataTable dt = mySqlControl.selectForList("select * from M_HINSHI where HINSHI_NO = " + mHinshiWork.Id);
-                            foreach (DataRow item in dt.Rows)
-                            {
-                                mHinshiWork.CreatedAt = DateTime.Parse(item["CREATED_AT"].ToString());
-                                mHinshiWork.UpdatedAt = DateTime.Parse(item["UPDATED_AT"].ToString());
-                            }
-                        }
-                    }
-                });
-
-                //品詞詳細1
-                lstHinSub1Selected.ForEach(delegate(MHinshi mHinshiSub1Work)
-                {
-                    if (mHinshiSub1Work.CreatedAt.Equals(new DateTime(0)) && mHinshiSub1Work.UpdatedAt.Equals(new DateTime(0)))
-                    {
-                        if (mySqlControl.insert("insert into M_HINSHI values (" + mHinshiSub1Work.Id + ", '" + mHinshiSub1Work.Name + "', "
-                            + mHinshiSub1Work.Level + ", " + mHinshiSub1Work.ParentId + ", Now(), Now(), " + mHinshiSub1Work.DeleteFlg + ")"))
-                        {
-                            DataTable dt = mySqlControl.selectForList("select * from M_HINSHI where HINSHI_NO = " + mHinshiSub1Work.Id);
-                            foreach (DataRow item in dt.Rows)
-                            {
-                                mHinshiSub1Work.CreatedAt = DateTime.Parse(item["CREATED_AT"].ToString());
-                                mHinshiSub1Work.UpdatedAt = DateTime.Parse(item["UPDATED_AT"].ToString());
-                            }
-                        }
-                    }
-                });
-
-                //品詞詳細2
-                lstHinSub2Selected.ForEach(delegate(MHinshi mHinshiSub2Work)
-                {
-                    if (mHinshiSub2Work.CreatedAt.Equals(new DateTime(0)) && mHinshiSub2Work.UpdatedAt.Equals(new DateTime(0)))
-                    {
-                        if (mySqlControl.insert("insert into M_HINSHI values (" + mHinshiSub2Work.Id + ", '" + mHinshiSub2Work.Name + "', "
-                            + mHinshiSub2Work.Level + ", " + mHinshiSub2Work.ParentId + ", Now(), Now(), " + mHinshiSub2Work.DeleteFlg + ")"))
-                        {
-                            DataTable dt = mySqlControl.selectForList("select * from M_HINSHI where HINSHI_NO = " + mHinshiSub2Work.Id);
-                            foreach (DataRow item in dt.Rows)
-                            {
-                                mHinshiSub2Work.CreatedAt = DateTime.Parse(item["CREATED_AT"].ToString());
-                                mHinshiSub2Work.UpdatedAt = DateTime.Parse(item["UPDATED_AT"].ToString());
-                            }
-                        }
-                    }
-                });
-
-                //品詞詳細3
-                lstHinSub3Selected.ForEach(delegate(MHinshi mHinshiSub3Work)
-                {
-                    if (mHinshiSub3Work.CreatedAt.Equals(new DateTime(0)) && mHinshiSub3Work.UpdatedAt.Equals(new DateTime(0)))
-                    {
-                        if (mySqlControl.insert("insert into M_HINSHI values (" + mHinshiSub3Work.Id + ", '" + mHinshiSub3Work.Name + "', "
-                            + mHinshiSub3Work.Level + ", " + mHinshiSub3Work.ParentId + ", Now(), Now(), " + mHinshiSub3Work.DeleteFlg + ")"))
-                        {
-                            DataTable dt = mySqlControl.selectForList("select * from M_HINSHI where HINSHI_NO = " + mHinshiSub3Work.Id);
-                            foreach (DataRow item in dt.Rows)
-                            {
-                                mHinshiSub3Work.CreatedAt = DateTime.Parse(item["CREATED_AT"].ToString());
-                                mHinshiSub3Work.UpdatedAt = DateTime.Parse(item["UPDATED_AT"].ToString());
-                            }
-                        }
-                    }
-                });
-
-                //活用形
-                lstKatsuyo1Selected.ForEach(delegate(MKatsuyo mKatsuyou1Work)
-                {
-                    if (mKatsuyou1Work.CreatedAt.Equals(new DateTime(0)) && mKatsuyou1Work.UpdatedAt.Equals(new DateTime(0)))
-                    {
-                        if (mySqlControl.insert("insert into M_KATSUYO values (" + mKatsuyou1Work.Id + ", '" + mKatsuyou1Work.Name + "', "
-                            + mKatsuyou1Work.Level + ", " + mKatsuyou1Work.ParentId + ", Now(), Now(), " + mKatsuyou1Work.DeleteFlg + ")"))
-                        {
-                            DataTable dt = mySqlControl.selectForList("select * from M_HINSHI where HINSHI_NO = " + mKatsuyou1Work.Id);
-                            foreach (DataRow item in dt.Rows)
-                            {
-                                mKatsuyou1Work.CreatedAt = DateTime.Parse(item["CREATED_AT"].ToString());
-                                mKatsuyou1Work.UpdatedAt = DateTime.Parse(item["UPDATED_AT"].ToString());
-                            }
-                        }
-                    }
-                });
-
-                //活用型
-                lstKatsuyo2Selected.ForEach(delegate(MKatsuyo mKatsuyou2Work)
-                {
-                    if (mKatsuyou2Work.CreatedAt.Equals(new DateTime(0)) && mKatsuyou2Work.UpdatedAt.Equals(new DateTime(0)))
-                    {
-                        if (mySqlControl.insert("insert into M_KATSUYO values (" + mKatsuyou2Work.Id + ", '" + mKatsuyou2Work.Name + "', "
-                            + mKatsuyou2Work.Level + ", " + mKatsuyou2Work.ParentId + ", Now(), Now(), " + mKatsuyou2Work.DeleteFlg + ")"))
-                        {
-                            DataTable dt = mySqlControl.selectForList("select * from M_HINSHI where HINSHI_NO = " + mKatsuyou2Work.Id);
-                            foreach (DataRow item in dt.Rows)
-                            {
-                                mKatsuyou2Work.CreatedAt = DateTime.Parse(item["CREATED_AT"].ToString());
-                                mKatsuyou2Work.UpdatedAt = DateTime.Parse(item["UPDATED_AT"].ToString());
-                            }
-                        }
-                    }
-                });
+                // 形態要素の各項目更新
+                updateMorhemeItems();
 
                 //学習用Csv
                 lstMyLearnSeedResult.Clear();
@@ -244,15 +138,101 @@ namespace MecabEditor
             {
                 MessageBox.Show(ex.Message);
             }
-            finally
-            {
-                
-            }
 
             intReturnValue = 1;
             mySeedInfoResult = new MSeed(mySeedInfo);
 
             Close();
+        }
+
+        //形態要素の項目更新
+        private void updateMorhemeItems()
+        {
+            // 品詞情報を更新
+            registerHinshi(lstHinshi);
+
+            // 品詞詳細1情報を更新
+            registerHinshi(lstHinSub1Selected);
+
+            // 品詞詳細2情報を更新
+            registerHinshi(lstHinSub2Selected);
+
+            // 品詞詳細3情報を更新
+            registerHinshi(lstHinSub3Selected);
+
+            // 活用形情報を更新
+            registerKatsuyo(lstKatsuyo1Selected);
+
+            // 活用型情報を更新
+            registerKatsuyo(lstKatsuyo2Selected);
+        }
+
+        //未登録の品詞を登録
+        private void registerHinshi(List<MHinshi> lstHinshi)
+        {
+            lstHinshi.ForEach(delegate(MHinshi mHinshiWork)
+            {
+                if (mHinshiWork.CreatedAt.Equals(new DateTime(0)) && mHinshiWork.UpdatedAt.Equals(new DateTime(0)))
+                {
+                    // 存在チェックを行う
+                    StringBuilder sbCheck = new StringBuilder();
+                    sbCheck.Append("select count(1) from M_HINSHI where HINSHI_LEVEL = ");
+                    sbCheck.Append(mHinshiWork.Level);
+                    sbCheck.Append(" and PARENT_HINSHI_NO = ");
+                    sbCheck.Append(mHinshiWork.ParentId);
+                    sbCheck.Append(" and HINSHI_BASIC = \'");
+                    sbCheck.Append(mHinshiWork.Name);
+                    sbCheck.Append("\'");
+                    DataTable dtCheck = mySqlControl.selectForList(sbCheck.ToString());
+                    if (dtCheck.Rows.Count == 0)
+                    {
+                        //登録処理
+                        if (mySqlControl.insert("insert into M_HINSHI values (" + mHinshiWork.Id + ", '" + mHinshiWork.Name + "', "
+                            + mHinshiWork.ParentId + ", " + mHinshiWork.Level + ", Now(), Now(), " + mHinshiWork.DeleteFlg + ")"))
+                        {
+                            DataTable dt = mySqlControl.selectForList("select * from M_HINSHI where HINSHI_NO = " + mHinshiWork.Id);
+                            foreach (DataRow item in dt.Rows)
+                            {
+                                mHinshiWork.CreatedAt = DateTime.Parse(item["CREATED_AT"].ToString());
+                                mHinshiWork.UpdatedAt = DateTime.Parse(item["UPDATED_AT"].ToString());
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        //未登録の活用形を登録
+        private void registerKatsuyo(List<MKatsuyo> lstKatsuyo)
+        {
+            lstKatsuyo.ForEach(delegate(MKatsuyo mKatsuyou)
+            {
+                if (mKatsuyou.CreatedAt.Equals(new DateTime(0)) && mKatsuyou.UpdatedAt.Equals(new DateTime(0)))
+                {
+                    StringBuilder sbCheck = new StringBuilder();
+                    sbCheck.Append("select count(1) from M_KATSUYO where KATSUYO_LEVEL = ");
+                    sbCheck.Append(mKatsuyou.Level);
+                    sbCheck.Append(" and PARENT_KATSUYO_NO = ");
+                    sbCheck.Append(mKatsuyou.ParentId);
+                    sbCheck.Append(" and KATSUYO_BASIC = \'");
+                    sbCheck.Append(mKatsuyou.Name);
+                    sbCheck.Append("\'");
+                    DataTable dtCheck = mySqlControl.selectForList(sbCheck.ToString());
+                    if (dtCheck.Rows.Count == 0)
+                    {
+                        if (mySqlControl.insert("insert into M_KATSUYO values (" + mKatsuyou.Id + ", '" + mKatsuyou.Name + "', "
+                            + mKatsuyou.ParentId + ", " + mKatsuyou.Level + ", Now(), Now(), " + mKatsuyou.DeleteFlg + ")"))
+                        {
+                            DataTable dt = mySqlControl.selectForList("select * from M_KATSUYO where KATSUYO_NO = " + mKatsuyou.Id);
+                            foreach (DataRow item in dt.Rows)
+                            {
+                                mKatsuyou.CreatedAt = DateTime.Parse(item["CREATED_AT"].ToString());
+                                mKatsuyou.UpdatedAt = DateTime.Parse(item["UPDATED_AT"].ToString());
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         //入力チェック
@@ -409,7 +389,7 @@ namespace MecabEditor
                 }
             });
             // 該当データがない場合
-            if (destList.Count == 0)
+            if (destList.Count == 0 && comboBox.Items.Count == 1)
             {
                 MHinshi wrkHinshi = new MHinshi();
                 wrkHinshi.ParentId = parentId;
@@ -485,7 +465,7 @@ namespace MecabEditor
                 }
             });
             // 該当データがない場合
-            if (destList.Count == 0)
+            if (destList.Count == 0 && comboBox.Items.Count == 1)
             {
                 MKatsuyo wrkKatsuyo = new MKatsuyo();
                 wrkKatsuyo.ParentId = parentId;
@@ -828,69 +808,53 @@ namespace MecabEditor
                 }
 
                 //品詞リストにないものがあれば追加しておく。
-                int indexHinshi = MyUtils.checkHinshiList(lstHinshi, 0, -1, mySeedInfo.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString());
-                if (indexHinshi > -1)
+                int indexHinshi = MyUtils.checkHinshiList(lstHinshi, 0, -1, mySeedInfo.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString(), true);
+                if (indexHinshi < -1)
                 {
-                    lstHinSub1Selected.Add(lstHinshi[lstHinshi.Count - 1]);
-                }
-                else
-                {
-                    indexHinshi = 0;
+                    indexHinshi = lstHinshi.Count - 1;
                 }
                 
                 //品詞詳細1リストにないものがあれば追加する
-                int indexHinshiSub1 = MyUtils.checkHinshiList(lstHinshiSub1, 1, lstHinshi[indexHinshi].Id, mySeedInfo.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]].ToString());
-                if (indexHinshiSub1 > -1)
+                int indexHinshiSub1 = MyUtils.checkHinshiList(lstHinshiSub1, 1, lstHinshi[indexHinshi].Id, mySeedInfo.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]].ToString(), true);
+                if (indexHinshiSub1 < 0)
                 {
-                    lstHinSub1Selected.Add(lstHinshiSub1[lstHinshiSub1.Count - 1]);
+                    indexHinshiSub1 = lstHinshiSub1.Count - 1;
+                    lstHinSub1Selected.Add(lstHinshiSub1[indexHinshiSub1]);
                 }
-                else
-                {
-                    indexHinshiSub1 = 0;
-                }
-
+                
                 //品詞詳細2リストにないものがあれば追加する
-                int indexHinshiSub2 = MyUtils.checkHinshiList(lstHinshiSub2, 2, lstHinshiSub1[indexHinshiSub1].Id, mySeedInfo.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]].ToString());
-                if (indexHinshiSub2 > -1)
+                int indexHinshiSub2 = MyUtils.checkHinshiList(lstHinshiSub2, 2, lstHinshiSub1[indexHinshiSub1].Id, mySeedInfo.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]].ToString(), true);
+                if (indexHinshiSub2 < 0)
                 {
-                    lstHinSub2Selected.Add(lstHinshiSub2[lstHinshiSub2.Count - 1]);
+                    indexHinshiSub2 = lstHinshiSub2.Count - 1;
+                    lstHinSub2Selected.Add(lstHinshiSub2[indexHinshiSub2]);
                 }
-                else
-                {
-                    indexHinshiSub2 = 0;
-                }
-
+                
                 //品詞詳細3リストにないものがあれば追加する
-                int indexHinshiSub3 = MyUtils.checkHinshiList(lstHinshiSub3, 3, lstHinshiSub2[indexHinshiSub2].Id, mySeedInfo.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]].ToString());
-                if (indexHinshiSub3 > -1)
+                int indexHinshiSub3 = MyUtils.checkHinshiList(lstHinshiSub3, 3, lstHinshiSub2[indexHinshiSub2].Id, mySeedInfo.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]].ToString(), true);
+                if (indexHinshiSub3 < 0)
                 {
-                    lstHinSub3Selected.Add(lstHinshiSub3[lstHinshiSub3.Count - 1]);
+                    indexHinshiSub3 = lstHinshiSub3.Count - 1;
+                    lstHinSub3Selected.Add(lstHinshiSub3[indexHinshiSub3]);
                 }
-                else
-                {
-                    indexHinshiSub3 = 0;
-                }
-
+                
                 //活用形リストにないものがあれば追加しておく
                 int indexKatsuyo1 = MyUtils.checkKatsuyoList(lstKatsuyo1, 1, lstHinshi[indexHinshi].Id, mySeedInfo.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_KEI"]].ToString());
-                if (indexKatsuyo1 > -1) {
-                    lstKatsuyo1Selected.Add(lstKatsuyo1[lstKatsuyo1.Count - 1]);
-                }
-                else
+                if (indexKatsuyo1 < 0)
                 {
-                    indexKatsuyo1 = 0;
+                    indexKatsuyo1 = lstKatsuyo1.Count - 1;
+                    lstKatsuyo1Selected.Add(lstKatsuyo1[indexKatsuyo1]);
+                    
                 }
-
+                
                 //活用型リストにないものがあれば追加しておく
                 int indexKatsuyo2 = MyUtils.checkKatsuyoList(lstKatsuyo2, 2, lstKatsuyo1[indexKatsuyo1].Id, mySeedInfo.DictionaryMembers[XmlDatas.ListItemNames["KATSUYO_TYPE"]].ToString());
-                if (indexKatsuyo2 > -1) {
-                    lstKatsuyo2Selected.Add(lstKatsuyo2[lstKatsuyo2.Count - 1]);
-                }
-                else
+                if (indexKatsuyo2 < 0)
                 {
-                    indexKatsuyo2 = 0;
+                    indexKatsuyo2 = lstKatsuyo2.Count - 1;
+                    lstKatsuyo2Selected.Add(lstKatsuyo2[indexKatsuyo2]);
                 }
-
+                
                 if (intProcessMode == 0)
                 {
                     //学習用の形態要素リストに追加
@@ -898,10 +862,18 @@ namespace MecabEditor
                 }
                 else
                 {
-                    //Seed情報設定
-                    intReturnValue = 1;
-                    mySeedInfoResult = new MSeed(mySeedInfo);
-
+                    try
+                    {
+                        // 形態要素の各項目更新
+                        updateMorhemeItems();
+                        intReturnValue = 1;
+                        mySeedInfoResult = new MSeed(mySeedInfo);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                        intReturnValue = 0;
+                    }
                     Close();
                 }
             }
@@ -1123,6 +1095,8 @@ namespace MecabEditor
         //品詞1変更時
         private void cmbHinshiDetail1_SelectedIndexChanged(object sender, EventArgs e)
         {
+            cmbHinshiDetail2.Items.Clear();
+            cmbHinshiDetail3.Items.Clear();
             int selected = MyUtils.getComboSelectedIndex(cmbHinshiDetail1);
             setHinshiComboBoxes(cmbHinshiDetail2, lstHinshiSub2, lstHinSub2Selected, lstHinSub1Selected[selected].Id, 2);
         }
@@ -1130,6 +1104,7 @@ namespace MecabEditor
         //品詞2変更時
         private void cmbHinshiDetail2_SelectedIndexChanged(object sender, EventArgs e)
         {
+            cmbHinshiDetail3.Items.Clear();
             int selected = MyUtils.getComboSelectedIndex(cmbHinshiDetail2);
             setHinshiComboBoxes(cmbHinshiDetail3, lstHinshiSub3, lstHinSub3Selected, lstHinSub2Selected[selected].Id, 3);
         }
@@ -1143,6 +1118,7 @@ namespace MecabEditor
         //活用形変更時
         private void cmbKatsuyoukei_SelectedIndexChanged(object sender, EventArgs e)
         {
+            cmbKatsuyoType.Items.Clear();
             int selected = MyUtils.getComboSelectedIndex(cmbKatsuyoukei);
             setKatsuyoComboBoxes(cmbKatsuyoType, lstKatsuyo2, lstKatsuyo2Selected, lstKatsuyo1[cmbKatsuyoukei.SelectedIndex].Id, 2);
         }

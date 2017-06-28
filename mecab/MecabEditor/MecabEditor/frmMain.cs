@@ -85,22 +85,22 @@ namespace MecabEditor
                 lstMSeed.ForEach(delegate(MSeed mSeedWork) 
                 {
                     //品詞リストにないものがあれば追加しておく
-                    int indexHinshi = MyUtils.checkHinshiList(lstHinshi, 0, -1, mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString());
+                    int indexHinshi = MyUtils.checkHinshiList(lstHinshi, 0, -1, mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString(), false);
                     if (indexHinshi < 0)
                         indexHinshi = 0;
                     
                     //品詞詳細1リストにないものがあれば追加する
-                    int indexHinshiSub1 = MyUtils.checkHinshiList(lstHinshiSub1, 1, lstHinshi[indexHinshi].Id, mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]].ToString());
+                    int indexHinshiSub1 = MyUtils.checkHinshiList(lstHinshiSub1, 1, lstHinshi[indexHinshi].Id, mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]].ToString(), false);
                     if (indexHinshiSub1 < 0)
                         indexHinshiSub1 = 0;
 
                     //品詞詳細2リストにないものがあれば追加する
-                    int indexHinshiSub2 = MyUtils.checkHinshiList(lstHinshiSub2, 2, lstHinshiSub1[indexHinshiSub1].Id, mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]].ToString());
+                    int indexHinshiSub2 = MyUtils.checkHinshiList(lstHinshiSub2, 2, lstHinshiSub1[indexHinshiSub1].Id, mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]].ToString(), false);
                     if (indexHinshiSub2 < 0)
                         indexHinshiSub2 = 0;
 
                     //品詞詳細3リストにないものがあれば追加する
-                    int indexHinshiSub3 = MyUtils.checkHinshiList(lstHinshiSub3, 3, lstHinshiSub2[indexHinshiSub2].Id, mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]].ToString());
+                    int indexHinshiSub3 = MyUtils.checkHinshiList(lstHinshiSub3, 3, lstHinshiSub2[indexHinshiSub2].Id, mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]].ToString(), false);
                     if (indexHinshiSub3 < 0)
                         indexHinshiSub3 = 0;
 
@@ -571,22 +571,22 @@ namespace MecabEditor
                     lstMyMSeed.Add(mSeedWork);
 
                     //品詞リストにないものがあれば追加しておく
-                    int indexHinshi = MyUtils.checkHinshiList(lstHinshi, 0, -1, mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString());
+                    int indexHinshi = MyUtils.checkHinshiList(lstHinshi, 0, -1, mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI"]].ToString(), false);
                     if (indexHinshi < 0)
                         indexHinshi = 0;
                     
                     //品詞詳細1リストにないものがあれば追加する
-                    int indexHinshiSub1 = MyUtils.checkHinshiList(lstHinshiSub1, 1, lstHinshi[indexHinshi].Id, mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]].ToString());
+                    int indexHinshiSub1 = MyUtils.checkHinshiList(lstHinshiSub1, 1, lstHinshi[indexHinshi].Id, mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_1"]].ToString(), false);
                     if (indexHinshiSub1 < 0)
                         indexHinshiSub1 = 0;
 
                     //品詞詳細2リストにないものがあれば追加する
-                    int indexHinshiSub2 = MyUtils.checkHinshiList(lstHinshiSub2, 2, lstHinshiSub1[indexHinshiSub1].Id, mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]].ToString());
+                    int indexHinshiSub2 = MyUtils.checkHinshiList(lstHinshiSub2, 2, lstHinshiSub1[indexHinshiSub1].Id, mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_2"]].ToString(), false);
                     if (indexHinshiSub2 < 0)
                         indexHinshiSub2 = 0;
                     
                     //品詞詳細3リストにないものがあれば追加する
-                    int indexHinshiSub3 = MyUtils.checkHinshiList(lstHinshiSub3, 3, lstHinshiSub2[indexHinshiSub2].Id, mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]].ToString());
+                    int indexHinshiSub3 = MyUtils.checkHinshiList(lstHinshiSub3, 3, lstHinshiSub2[indexHinshiSub2].Id, mSeedWork.DictionaryMembers[XmlDatas.ListItemNames["HINSHI_DETAIL_3"]].ToString(), false);
                     if (indexHinshiSub3 < 0)
                         indexHinshiSub3 = 0;
                     
@@ -767,7 +767,6 @@ namespace MecabEditor
         //csvファイルの出力
         private Boolean outputCsvFile(String strFilePath = "")
         {
-            Boolean bResult = false;
             String filePath = String.Empty;
             String fileName = String.Empty;
 
@@ -1243,7 +1242,7 @@ namespace MecabEditor
             foreach (MorphemeReplaceInfo morphemeReplaceInfoEach in lstMorphemeReplaceInfo)
             {
                 List<MSeed> lstSelectedSeeds = new List<MSeed>();
-                MSeed seedCelected = new MSeed();
+                MSeed seedSelected = new MSeed();
 
                 //当たり判定
                 Boolean bHit = false;
@@ -1260,127 +1259,20 @@ namespace MecabEditor
                             intSourceMax = lstMSeed.Count;
 
                         lstSelectedSeeds.Clear();
-                        seedCelected = new MSeed();
+                        seedSelected = new MSeed();
 
                         //ループモードでない場合
                         if (!morphemeReplaceInfoEach.IsLoop)
                         {
                             for (int i = intCurrent; i < intSourceMax; i++)
                             {
-                                bHit = false;
-
-                                if (!morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["HYOSO_TYPE"].Equals(String.Empty))
-                                {
-                                    if (lstMSeed[i].DictionaryMembers["HYOSO_TYPE"].Equals(morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["HYOSO_TYPE"]))
-                                    {
-                                        bHit = true;
-                                    }
-                                    else
-                                    {
-                                        bHit = false;
-                                        break;
-                                    }
-                                }
-                                else
-                                {
-                                    //表層ファイルを使用する場合
-                                    if (morphemeReplaceInfoEach.IsUseHyosoFile && morphemeReplaceInfoEach.HyosoIndex == i)
-                                    {
-                                        bHit = false;
-
-                                        morphemeReplaceInfoEach.ListHyoso.ForEach(delegate(String strHyosoWork)
-                                        {
-                                            if (strHyosoWork.Equals(lstMSeed[i].DictionaryMembers["HYOSO_TYPE"]))
-                                                bHit = true;
-                                        });
-
-                                        if (!bHit)
-                                            break;
-                                    }
-                                }
-
-                                if (!morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["HINSHI"].Equals(String.Empty))
-                                {
-                                    if (lstMSeed[i].DictionaryMembers["HINSHI"].Equals(morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["HINSHI"]))
-                                    {
-                                        bHit = true;
-                                    }
-                                    else
-                                    {
-                                        bHit = false;
-                                        break;
-                                    }
-                                }
-
-                                if (!morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["HINSHI_DETAIL_1"].Equals(String.Empty))
-                                {
-                                    if (lstMSeed[i].DictionaryMembers["HINSHI_DETAIL_1"].Equals(morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["HINSHI_DETAIL_1"]))
-                                    {
-                                        bHit = true;
-                                    }
-                                    else
-                                    {
-                                        bHit = false;
-                                        break;
-                                    }
-                                }
-
-                                if (!morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["HINSHI_DETAIL_2"].Equals(String.Empty))
-                                {
-                                    if (lstMSeed[i].DictionaryMembers["HINSHI_DETAIL_2"].Equals(morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["HINSHI_DETAIL_2"]))
-                                    {
-                                        bHit = true;
-                                    }
-                                    else
-                                    {
-                                        bHit = false;
-                                        break;
-                                    }
-                                }
-
-                                if (!morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["HINSHI_DETAIL_3"].Equals(String.Empty))
-                                {
-                                    if (lstMSeed[i].DictionaryMembers["HINSHI_DETAIL_3"].Equals(morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["HINSHI_DETAIL_3"]))
-                                    {
-                                        bHit = true;
-                                    }
-                                    else
-                                    {
-                                        bHit = false;
-                                        break;
-                                    }
-                                }
-
-                                if (!morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["KATSUYO_KEI"].Equals(String.Empty))
-                                {
-                                    if (lstMSeed[i].DictionaryMembers["KATSUYO_KEI"].Equals(morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["KATSUYO_KEI"]))
-                                    {
-                                        bHit = true;
-                                    }
-                                    else
-                                    {
-                                        bHit = false;
-                                        break;
-                                    }
-                                }
-
-                                if (!morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["KATSUYO_TYPE"].Equals(String.Empty))
-                                {
-                                    if (lstMSeed[i].DictionaryMembers["KATSUYO_TYPE"].Equals(morphemeReplaceInfoEach.ListSource[intCheckCount].DictionaryMembers["KATSUYO_TYPE"]))
-                                    {
-                                        bHit = true;
-                                    }
-                                    else
-                                    {
-                                        bHit = false;
-                                        break;
-                                    }
-                                }
-
-                                intCheckCount++;
+                                //形態要素置換情報にヒットしているか判定
+                                bHit = isHitMorphemeReplaceInfo(morphemeReplaceInfoEach, i, intCheckCount); ;
 
                                 if (!bHit)
                                     break;
+
+                                intCheckCount++;
                             }
                         }
                         else
@@ -1399,131 +1291,31 @@ namespace MecabEditor
 
                             while (!bIsCheckEnd)
                             {
-                                bHit = false;
-
-                                if (!morphemeReplaceInfoEach.ListSource[intWorkCount].DictionaryMembers["HYOSO_TYPE"].Equals(String.Empty))
-                                {
-                                    if (lstMSeed[intCurrrntWork].DictionaryMembers["HYOSO_TYPE"].Equals(morphemeReplaceInfoEach.ListSource[intWorkCount].DictionaryMembers["HYOSO_TYPE"]))
-                                    {
-                                        bHit = true;
-                                    }
-                                    else
-                                    {
-                                        bHit = false;
-                                    }
-                                }
-                                else
-                                {
-                                    //表層ファイルを使用する場合
-                                    if (morphemeReplaceInfoEach.IsUseHyosoFile && morphemeReplaceInfoEach.HyosoIndex == intWorkCount)
-                                    {
-                                        bHit = false;
-
-                                        morphemeReplaceInfoEach.ListHyoso.ForEach(delegate(String strHyosoWork)
-                                        {
-                                            if (strHyosoWork.Equals(lstMSeed[intCurrrntWork].DictionaryMembers["HYOSO_TYPE"]))
-                                                bHit = true;
-                                        });
-
-                                        if (!bHit)
-                                            break;
-                                    }
-                                }
-
-                                if (!morphemeReplaceInfoEach.ListSource[intWorkCount].DictionaryMembers["HINSHI"].Equals(String.Empty))
-                                {
-                                    if (lstMSeed[intCurrrntWork].DictionaryMembers["HINSHI"].Equals(morphemeReplaceInfoEach.ListSource[intWorkCount].DictionaryMembers["HINSHI"]))
-                                    {
-                                        bHit = true;
-                                    }
-                                    else
-                                    {
-                                        bHit = false;
-                                    }
-                                }
-
-                                if (!morphemeReplaceInfoEach.ListSource[intWorkCount].DictionaryMembers["HINSHI_DETAIL_1"].Equals(String.Empty))
-                                {
-                                    if (lstMSeed[intCurrrntWork].DictionaryMembers["HINSHI_DETAIL_1"].Equals(morphemeReplaceInfoEach.ListSource[intWorkCount].DictionaryMembers["HINSHI_DETAIL_1"]))
-                                    {
-                                        bHit = true;
-                                    }
-                                    else
-                                    {
-                                        bHit = false;
-                                    }
-                                }
-
-                                if (!morphemeReplaceInfoEach.ListSource[intWorkCount].DictionaryMembers["HINSHI_DETAIL_2"].Equals(String.Empty))
-                                {
-                                    if (lstMSeed[intCurrrntWork].DictionaryMembers["HINSHI_DETAIL_2"].Equals(morphemeReplaceInfoEach.ListSource[intWorkCount].DictionaryMembers["HINSHI_DETAIL_2"]))
-                                    {
-                                        bHit = true;
-                                    }
-                                    else
-                                    {
-                                        bHit = false;
-                                    }
-                                }
-
-                                if (!morphemeReplaceInfoEach.ListSource[intWorkCount].DictionaryMembers["HINSHI_DETAIL_3"].Equals(String.Empty))
-                                {
-                                    if (lstMSeed[intCurrrntWork].DictionaryMembers["HINSHI_DETAIL_3"].Equals(morphemeReplaceInfoEach.ListSource[intWorkCount].DictionaryMembers["HINSHI_DETAIL_3"]))
-                                    {
-                                        bHit = true;
-                                    }
-                                    else
-                                    {
-                                        bHit = false;
-                                    }
-                                }
-
-                                if (!morphemeReplaceInfoEach.ListSource[intWorkCount].DictionaryMembers["KATSUYO_KEI"].Equals(String.Empty))
-                                {
-                                    if (lstMSeed[intCurrrntWork].DictionaryMembers["KATSUYO_KEI"].Equals(morphemeReplaceInfoEach.ListSource[intWorkCount].DictionaryMembers["KATSUYO_KEI"]))
-                                    {
-                                        bHit = true;
-                                    }
-                                    else
-                                    {
-                                        bHit = false;
-                                    }
-                                }
-
-                                if (!morphemeReplaceInfoEach.ListSource[intWorkCount].DictionaryMembers["KATSUYO_TYPE"].Equals(String.Empty))
-                                {
-                                    if (lstMSeed[intCurrrntWork].DictionaryMembers["KATSUYO_TYPE"].Equals(morphemeReplaceInfoEach.ListSource[intWorkCount].DictionaryMembers["KATSUYO_TYPE"]))
-                                    {
-                                        bHit = true;
-                                    }
-                                    else
-                                    {
-                                        bHit = false;
-                                    }
-                                }
+                                //形態要素置換情報にヒットしているか判定
+                                bHit = isHitMorphemeReplaceInfo(morphemeReplaceInfoEach, intCurrrntWork, intWorkCount);
 
                                 if (bHit)
                                 {
                                     intHitCount++;
                                     lstIsExist[intWorkCount] = true;
                                     intCurrrntWork++;
+                                    intWorkCount++;
                                 }
                                 else
                                 {
-                                    intWorkCount++;
-                                    if (intWorkCount >= intCheckCount)
-                                    {
-                                        intCurrrntWork++;
-                                        intWorkCount = 0;
-                                        bIsCheckEnd = true;
-                                    }
+                                    //置換情報内の1つ目の形態要素と一致しない場合は、その置換情報に対する比較処理は終わり。
+                                    intWorkCount = 0;
+                                    bIsCheckEnd = true;
                                 }
 
                                 if (intCurrrntWork > lstMSeed.Count - 1)
                                     bIsCheckEnd = true;
+                                else if (intWorkCount == intCheckCount)
+                                    bIsCheckEnd = true;
                             }
 
-                            if (intHitCount > 1 && intHitCount >= morphemeReplaceInfoEach.ListSourceCount)
+                            //バグと思われるので修正
+                            if (intHitCount > 1 && intHitCount == morphemeReplaceInfoEach.ListSourceCount)
                             {
                                 Boolean bIsAllExist = true;
                                 lstIsExist.ForEach(delegate(Boolean bIsExistWork)
@@ -1546,22 +1338,31 @@ namespace MecabEditor
                         //キャンセル対象か確認する
                         if (bHit)
                         {
+                            //デバッグ時にヒット判定された対象を出力
+                            outputMorphReplaceInfo(morphemeReplaceInfoEach, intCurrent, intSourceMax, lstMSeed);
+
                             int intHitCount = intSourceMax - intCurrent;
 
                             lstNoTanseSeed.ForEach(delegate(NoTranseInfo noTransInfoDelegate)
                             {
-                                Boolean bIsExist = true;
+                                Boolean bIsExist = false;
 
                                 if (noTransInfoDelegate.lstNoTransInfo.Count == intHitCount)
                                 {
                                     for (int i = 0; i < intHitCount; i++)
                                     {
-                                        if (lstMSeed[intCurrent + i].DictionaryMembers["HYOSO_TYPE"].ToString().Equals(noTransInfoDelegate.lstNoTransInfo[i].DictionaryMembers["HYOSO_TYPE"].ToString()) && lstMSeed[intCurrent + i].DictionaryMembers["HINSHI"].ToString().Equals(noTransInfoDelegate.lstNoTransInfo[i].DictionaryMembers["HINSHI"].ToString()))
+                                        if (lstMSeed[intCurrent + i].DictionaryMembers["HYOSO_TYPE"].ToString().Equals(noTransInfoDelegate.lstNoTransInfo[i].DictionaryMembers["HYOSO_TYPE"].ToString()) 
+                                            && lstMSeed[intCurrent + i].DictionaryMembers["HINSHI"].ToString().Equals(noTransInfoDelegate.lstNoTransInfo[i].DictionaryMembers["HINSHI"].ToString())
+                                            && lstMSeed[intCurrent + i].DictionaryMembers["HINSHI_DETAIL_1"].ToString().Equals(noTransInfoDelegate.lstNoTransInfo[i].DictionaryMembers["HINSHI_DETAIL_1"].ToString())
+                                            && lstMSeed[intCurrent + i].DictionaryMembers["HINSHI_DETAIL_2"].ToString().Equals(noTransInfoDelegate.lstNoTransInfo[i].DictionaryMembers["HINSHI_DETAIL_2"].ToString())
+                                            && lstMSeed[intCurrent + i].DictionaryMembers["HINSHI_DETAIL_3"].ToString().Equals(noTransInfoDelegate.lstNoTransInfo[i].DictionaryMembers["HINSHI_DETAIL_3"].ToString())
+                                            && lstMSeed[intCurrent + i].DictionaryMembers["KATSUYO_KEI"].ToString().Equals(noTransInfoDelegate.lstNoTransInfo[i].DictionaryMembers["KATSUYO_KEI"].ToString())
+                                            && lstMSeed[intCurrent + i].DictionaryMembers["KATSUYO_TYPE"].ToString().Equals(noTransInfoDelegate.lstNoTransInfo[i].DictionaryMembers["KATSUYO_TYPE"].ToString())
+                                            && lstMSeed[intCurrent + i].DictionaryMembers["BASE_TYPE"].ToString().Equals(noTransInfoDelegate.lstNoTransInfo[i].DictionaryMembers["BASE_TYPE"].ToString())
+                                            && lstMSeed[intCurrent + i].DictionaryMembers["YOMI"].ToString().Equals(noTransInfoDelegate.lstNoTransInfo[i].DictionaryMembers["YOMI"].ToString())
+                                            && lstMSeed[intCurrent + i].DictionaryMembers["HATSUON"].ToString().Equals(noTransInfoDelegate.lstNoTransInfo[i].DictionaryMembers["HATSUON"].ToString()))
                                         {
-                                        }
-                                        else
-                                        {
-                                            bIsExist = false;
+                                            bIsExist = true;
                                         }
                                     }
                                 }
@@ -1575,67 +1376,49 @@ namespace MecabEditor
 
                         if (bHit)
                         {
-                            seedCelected.DictionaryMembers["HYOSO_TYPE"] = String.Empty;
-                            seedCelected.DictionaryMembers["HINSHI"] = "*";
-                            seedCelected.DictionaryMembers["HINSHI_DETAIL_1"] = "*";
-                            seedCelected.DictionaryMembers["HINSHI_DETAIL_2"] = "*";
-                            seedCelected.DictionaryMembers["HINSHI_DETAIL_3"] = "*";
-                            seedCelected.DictionaryMembers["KATSUYO_KEI"] = "*";
-                            seedCelected.DictionaryMembers["KATSUYO_TYPE"] = "*";
-                            seedCelected.DictionaryMembers["BASE_TYPE"] = "*";
-                            seedCelected.DictionaryMembers["YOMI"] = String.Empty;
-                            seedCelected.DictionaryMembers["HATSUON"] = String.Empty;
+                            seedSelected.DictionaryMembers["HYOSO_TYPE"] = String.Empty;
+                            seedSelected.DictionaryMembers["HINSHI"] = "*";
+                            seedSelected.DictionaryMembers["HINSHI_DETAIL_1"] = "*";
+                            seedSelected.DictionaryMembers["HINSHI_DETAIL_2"] = "*";
+                            seedSelected.DictionaryMembers["HINSHI_DETAIL_3"] = "*";
+                            seedSelected.DictionaryMembers["KATSUYO_KEI"] = "*";
+                            seedSelected.DictionaryMembers["KATSUYO_TYPE"] = "*";
+                            seedSelected.DictionaryMembers["BASE_TYPE"] = "*";
+                            seedSelected.DictionaryMembers["YOMI"] = String.Empty;
+                            seedSelected.DictionaryMembers["HATSUON"] = String.Empty;
 
                             for (int i = intCurrent; i < intSourceMax; i++)
                             {
                                 lstSelectedSeeds.Add(lstMSeed[i]);
-
-                                String strWorkTranse = lstMSeed[i].DictionaryMembers["HYOSO_TYPE"].ToString();
-
-                                //変換後の品詞が数詞の場合
-                                //if (morphemeReplaceInfoEach.IsAuto && morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["HINSHI"].ToString().Equals(XmlDatas.ListNames["HINSHI_NUMBER"].ToString()))
-                                //{
-                                    //for (int j = 0; j < strTimeWordsSplit.Length; j++)
-                                    //{
-                                        //if (lstMSeed[i].DictionaryMembers["HYOSO_TYPE"].ToString().Equals(strTimeWordsSplit[j]))
-                                            //strWorkTranse = XmlDatas.ListNames["TIME"].ToString();
-                                    //}
-                                //}
-
-                                seedCelected.DictionaryMembers["HYOSO_TYPE"] += strWorkTranse;
-                                
-                                if (!morphemeReplaceInfoEach.IsAuto)
-                                {
-                                    seedCelected.DictionaryMembers["BASE_TYPE"] += lstMSeed[i].DictionaryMembers["BASE_TYPE"].ToString();
-                                    seedCelected.DictionaryMembers["YOMI"] += lstMSeed[i].DictionaryMembers["YOMI"].ToString();
-                                    seedCelected.DictionaryMembers["HATSUON"] += lstMSeed[i].DictionaryMembers["HATSUON"].ToString();
-                                }
+                                seedSelected.DictionaryMembers["HYOSO_TYPE"] += lstMSeed[i].DictionaryMembers["HYOSO_TYPE"].ToString();
+                                seedSelected.DictionaryMembers["BASE_TYPE"] += lstMSeed[i].DictionaryMembers["BASE_TYPE"].ToString();
+                                seedSelected.DictionaryMembers["YOMI"] += lstMSeed[i].DictionaryMembers["YOMI"].ToString();
+                                seedSelected.DictionaryMembers["HATSUON"] += lstMSeed[i].DictionaryMembers["HATSUON"].ToString();
                             }
 
                             if (morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["HINSHI"].ToString().Length > 0)
-                                seedCelected.DictionaryMembers["HINSHI"] = morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["HINSHI"].ToString();
+                                seedSelected.DictionaryMembers["HINSHI"] = morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["HINSHI"].ToString();
 
                             if (morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["HINSHI_DETAIL_1"].ToString().Length > 0)
-                                seedCelected.DictionaryMembers["HINSHI_DETAIL_1"] = morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["HINSHI_DETAIL_1"].ToString();
+                                seedSelected.DictionaryMembers["HINSHI_DETAIL_1"] = morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["HINSHI_DETAIL_1"].ToString();
 
                             if (morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["HINSHI_DETAIL_2"].ToString().Length > 0)
-                                seedCelected.DictionaryMembers["HINSHI_DETAIL_2"] = morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["HINSHI_DETAIL_2"].ToString();
+                                seedSelected.DictionaryMembers["HINSHI_DETAIL_2"] = morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["HINSHI_DETAIL_2"].ToString();
 
 
                             if (morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["HINSHI_DETAIL_3"].ToString().Length > 0)
-                                seedCelected.DictionaryMembers["HINSHI_DETAIL_3"] = morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["HINSHI_DETAIL_3"].ToString();
+                                seedSelected.DictionaryMembers["HINSHI_DETAIL_3"] = morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["HINSHI_DETAIL_3"].ToString();
 
                             if (morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["KATSUYO_KEI"].ToString().Length > 0)
-                                seedCelected.DictionaryMembers["KATSUYO_KEI"] = morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["KATSUYO_KEI"].ToString();
+                                seedSelected.DictionaryMembers["KATSUYO_KEI"] = morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["KATSUYO_KEI"].ToString();
 
                             if (morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["KATSUYO_TYPE"].ToString().Length > 0)
-                                seedCelected.DictionaryMembers["KATSUYO_TYPE"] = morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["KATSUYO_TYPE"].ToString();
+                                seedSelected.DictionaryMembers["KATSUYO_TYPE"] = morphemeReplaceInfoEach.ListDestination[0].DictionaryMembers["KATSUYO_TYPE"].ToString();
 
                             int intCurrentWorkMove = intCurrent;
                             if (intCurrentWorkMove < lstvwMain.Items.Count - 5)
                                 intCurrentWorkMove += 5;
 
-                            //lstvwMain.Items[intCurrent].EnsureVisible();
                             lstvwMain.Items[intCurrentWorkMove].EnsureVisible();
 
                             //編集画面の表示
@@ -1648,7 +1431,7 @@ namespace MecabEditor
                             frmEdit.ListKatsuyo2 = lstKatsuyo2;
                             frmEdit.systemInfo = systemInfo;
                             frmEdit.ListMyLearnSeed = lstMyMSeed;
-                            frmEdit.MySeedInfo = seedCelected;
+                            frmEdit.MySeedInfo = seedSelected;
                             frmEdit.ProcessMode = 0;
                             frmEdit.EditMode = 1;
 
@@ -1656,18 +1439,22 @@ namespace MecabEditor
                             {
                                 frmEdit.ShowDialog();
                             }
+                            else
+                            {
+                                lstMyMSeed.Add(seedSelected);
+                            }
 
                             if (frmEdit.ReturnValue == 1 || morphemeReplaceInfoEach.IsAuto)
                             {
                                 if (!morphemeReplaceInfoEach.IsAuto)
-                                    seedCelected = frmEdit.MySeedInfoResult;
+                                    seedSelected = frmEdit.MySeedInfoResult;
 
                                 //先ず先頭の要素を置換する
                                 for (int i = intCurrent; i < intSourceMax; i++)
                                 {
                                     lstMSeed.RemoveAt(intCurrent);
                                 }
-                                lstMSeed.Insert(intCurrent, seedCelected);
+                                lstMSeed.Insert(intCurrent, seedSelected);
 
                                 //次に、同様に置換対象となる要素を洗い出す
                                 List<int> lstIndexes = new List<int>();
@@ -1716,7 +1503,7 @@ namespace MecabEditor
 
                                 if (lstIndexes.Count > 0)
                                 {
-                                    String strMessageConfirm = seedCelected.DictionaryMembers["HYOSO_TYPE"].ToString() + "   " + String.Format(XmlDatas.ListMessages["CONFIRM_3"], lstIndexes.Count.ToString());
+                                    String strMessageConfirm = seedSelected.DictionaryMembers["HYOSO_TYPE"].ToString() + "   " + String.Format(XmlDatas.ListMessages["CONFIRM_3"], lstIndexes.Count.ToString());
                                     if (MessageBox.Show(strMessageConfirm, XmlDatas.ListNames["CONFIRM"], MessageBoxButtons.YesNo) == System.Windows.Forms.DialogResult.Yes)
                                     {
                                         intIndexWork = 0;
@@ -1755,7 +1542,7 @@ namespace MecabEditor
                                                         lstMSeed.RemoveAt(intStartWork);
                                                     }
 
-                                                    lstMSeed.Insert(intStartWork, seedCelected);
+                                                    lstMSeed.Insert(intStartWork, seedSelected);
 
                                                     intIndexWork += lstSelectedSeeds.Count;
                                                 }
@@ -1838,6 +1625,99 @@ namespace MecabEditor
                         }
                     }
                 }
+            }
+        }
+
+        /*  指定したコーパスと指定した形態要素置換情報のヒット判定
+         *  morphemeReplaceInfo:形態要素置換情報
+         *  currentWrk:コーパスの本文中の位置を示すInex
+         *  countWrk:形態要素置換情報のソースリストの位置を示すIndex
+         */
+        private Boolean isHitMorphemeReplaceInfo(MorphemeReplaceInfo morphemeReplaceInfo, int currentWrk, int countWrk)
+        {
+            Boolean bHit = true;
+
+            if (!morphemeReplaceInfo.ListSource[countWrk].DictionaryMembers["HYOSO_TYPE"].Equals(String.Empty))
+            {
+                if (!lstMSeed[currentWrk].DictionaryMembers["HYOSO_TYPE"].Equals(morphemeReplaceInfo.ListSource[countWrk].DictionaryMembers["HYOSO_TYPE"]))
+                {
+                    bHit = false;
+                }
+            }
+            else
+            {
+                //表層ファイルを使用する場合
+                if (morphemeReplaceInfo.IsUseHyosoFile && morphemeReplaceInfo.HyosoIndex == countWrk)
+                {
+                    Boolean bHit2 = false;
+
+                    morphemeReplaceInfo.ListHyoso.ForEach(delegate(String strHyosoWork)
+                    {
+                        if (strHyosoWork.Equals(lstMSeed[currentWrk].DictionaryMembers["HYOSO_TYPE"]))
+                            bHit2 = true;
+                    });
+
+                    if (!bHit2)
+                    {
+                        bHit = false;
+                        return bHit;
+                    }
+                }
+            }
+
+            //置換情報に品詞が含まれているか判定
+            if (bHit)
+                bHit = isMorphReplaceInfoHit(morphemeReplaceInfo, countWrk, currentWrk, "HINSHI", lstMSeed);
+
+            //置換情報に品詞詳細1が含まれているか判定
+            if (bHit)
+                bHit = isMorphReplaceInfoHit(morphemeReplaceInfo, countWrk, currentWrk, "HINSHI_DETAIL_1", lstMSeed);
+
+            //置換情報に品詞詳細2が含まれているか判定
+            if (bHit)
+                bHit = isMorphReplaceInfoHit(morphemeReplaceInfo, countWrk, currentWrk, "HINSHI_DETAIL_2", lstMSeed);
+
+            //置換情報に品詞詳細3が含まれているか判定
+            if (bHit)
+                bHit = isMorphReplaceInfoHit(morphemeReplaceInfo, countWrk, currentWrk, "HINSHI_DETAIL_3", lstMSeed);
+
+            //置換情報に活用形が含まれているか判定
+            if (bHit)
+                bHit = isMorphReplaceInfoHit(morphemeReplaceInfo, countWrk, currentWrk, "KATSUYO_KEI", lstMSeed);
+
+            //置換情報に活用型が含まれているか判定
+            if (bHit)
+                bHit = isMorphReplaceInfoHit(morphemeReplaceInfo, countWrk, currentWrk, "KATSUYO_TYPE", lstMSeed);
+
+            return bHit;
+        }
+
+        //置換情報の指定した属性が、形態要素リスト中の要素の指定した属性と同一か判定する
+        private Boolean isMorphReplaceInfoHit(MorphemeReplaceInfo morphReplaceInfo, int intCount, int intLstCount, String itemName, List<MSeed> lstMSeedWork)
+        {
+            Boolean bHit = true;
+
+            if (!morphReplaceInfo.ListSource[intCount].DictionaryMembers[itemName].Equals(String.Empty))
+            {
+                if (!lstMSeedWork[intLstCount].DictionaryMembers[itemName].Equals(morphReplaceInfo.ListSource[intCount].DictionaryMembers[itemName]))
+                {
+                    bHit = false;
+                }
+            }
+            return bHit;
+        }
+
+        // DEBUG用。Hit判定とされた際の内容を出力する
+        [Conditional("DEBUG")]
+        private void outputMorphReplaceInfo(MorphemeReplaceInfo morphReplaceInfo, int currentCnt, int maxCnt, List<MSeed> lstMSeedWork)
+        {
+            Console.WriteLine("Hit判定");
+            Console.WriteLine(morphReplaceInfo.MorphemeReplaceInfoName);
+            Console.WriteLine("開始行：" + currentCnt);
+            Console.WriteLine("終了行：" + maxCnt);
+            for (int i = currentCnt; i <= maxCnt; i++)
+            {
+                Console.WriteLine(lstMSeedWork[i].DictionaryMembers["HYOSO_TYPE"].ToString());
             }
         }
 

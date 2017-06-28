@@ -14,4 +14,5 @@
   <ERROR_8>{0}には数値を入力してください。</ERROR_8>
   <ERROR_9>{0}の書式が不正です。</ERROR_9>
   <INFORMATION_1>{0}を出力しました。</INFORMATION_1>
+  <INFORMATION_FINISHED>{0}が完了しました。</INFORMATION_FINISHED>
 </Messages>

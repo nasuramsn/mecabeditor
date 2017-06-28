@@ -10,4 +10,3 @@ C:\project\MecabEditor\MecabEditor\obj\Debug\MecabEditor.Properties.Resources.re
 C:\project\MecabEditor\MecabEditor\obj\Debug\MecabEditor.csproj.GenerateResource.Cache
 C:\project\MecabEditor\MecabEditor\obj\Debug\MecabEditor.exe
 C:\project\MecabEditor\MecabEditor\obj\Debug\MecabEditor.pdb
-C:\project\MecabEditor\MecabEditor\obj\Debug\MecabEditor.csprojResolveAssemblyReference.cache

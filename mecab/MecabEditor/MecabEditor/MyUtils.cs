@@ -661,13 +661,34 @@ namespace MecabEditor
         }
 
         // 品詞リストのチェック。なければ追加する
-        public static int checkHinshiList(List<MHinshi> lstSrc, int hinshiLevel, int parentId, String hinshiName)
+        // lstSrc:品詞リスト
+        // hinshiLevel:品詞レベル
+        // parentId:親ID
+        // hinshiName:品詞名
+        // noSpace:空白許可
+        public static int checkHinshiList(List<MHinshi> lstSrc, int hinshiLevel, int parentId, String hinshiName, Boolean noSpace)
         {
-            int indexHinshi = lstSrc.FindIndex(x => x.Name.Equals(hinshiName) && x.Level == hinshiLevel && x.ParentId == parentId);
+            String strName = "*";
+            Boolean bEdit = false;
 
-            if (indexHinshi < 0)
+            if (hinshiName.Equals(String.Empty))
             {
-                if (!hinshiName.Equals(String.Empty))
+                if (noSpace)
+                {
+                    bEdit = true;
+                }
+            }
+            else
+            {
+                strName = hinshiName;
+                bEdit = true;
+            }
+
+            int indexHinshi = lstSrc.FindIndex(x => x.Name.Equals(strName) && x.Level == hinshiLevel && x.ParentId == parentId);
+
+            if (bEdit)
+            {
+                if (indexHinshi < 0)
                 {
                     MHinshi mNewHinshi = new MHinshi();
                     mNewHinshi.ParentId = parentId;
@@ -678,23 +699,14 @@ namespace MecabEditor
                         List<MHinshi> lstWrk = lstSrc.FindAll(x => x.Level == hinshiLevel && x.ParentId == parentId);
                         mNewHinshi.Id = (mNewHinshi.ParentId * 100) + lstWrk.Count + 1;
                     }
-                    mNewHinshi.Name = hinshiName;
+                    mNewHinshi.Name = strName;
                     mNewHinshi.Level = hinshiLevel;
                     mNewHinshi.DeleteFlg = "0";
 
                     lstSrc.Add(mNewHinshi);
-                    indexHinshi = lstSrc.Count - 1;
-                }
-                else
-                {
-                    indexHinshi = lstSrc.Count - 1;
                 }
             }
-            else
-            {
-                indexHinshi = -1;
-            }
-
+            
             return indexHinshi;
         }
 
